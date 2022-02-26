@@ -10,7 +10,7 @@ Requires sv_cheats. Be any titan and run ```script GiveArchon()``` to give the l
 
 *Weapon:* Arc Cannon
 
-- Primary Fire: Charges a bolt of electricity before firing, damage scales with charge.
+- Charges a bolt of electricity before firing, damage and effects scales with charge.
 
 *Offensive:* Charge Ball
 
