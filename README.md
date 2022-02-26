@@ -1,4 +1,4 @@
-# Moblin.Archon
+# Archon
 
 **REQUIRED BY SERVER AND CLIENT**
 
