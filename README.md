@@ -23,4 +23,4 @@ Requires sv_cheats. Be any titan and run ```script GiveArchon()``` to give the l
 
 *Utility:* Tesla Node
 
-- Deploys a node that creates and electric field around itself.
+- Deploys a node that creates a damaging electric field around itself.
