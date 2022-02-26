@@ -15,7 +15,7 @@ Requires sv_cheats. Be any titan and run ```script GiveArchon()``` to give the l
 
 *Offensive:* Charge Ball
 
-- Fires a powerful electric ball, fully charge to fire *Three* slightly weaker shots at once.
+- Fires a powerful electric ball, fully charge to fire three slightly weaker shots at once.
 
 *Defensive:* Shock Shield
 
