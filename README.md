@@ -10,16 +10,16 @@ Requires sv_cheats. Be any titan and run ```script GiveArchon()``` to give the l
 
 *Weapon:* Arc Cannon
 
-Primary Fire: Charges a bolt of electricity before firing, damage scales with charge.
+- Primary Fire: Charges a bolt of electricity before firing, damage scales with charge.
 
 *Offensive:* Charge Ball
 
-Fires a powerful electric ball, fully charge to fire *Three* slightly weaker shots at once.
+- Fires a powerful electric ball, fully charge to fire *Three* slightly weaker shots at once.
 
 *Defensive:* Shock Shield
 
-Deploys a hand shield similar to Vortex Shield, when released, it releases an electric shock that massively stuns targets.
+- Deploys a hand shield similar to Vortex Shield, when released, it releases an electric shock that massively stuns targets.
 
 *Utility:* Tesla Node
 
-Deploys a node that creates and electric field around itself.
+- Deploys a node that creates and electric field around itself.
