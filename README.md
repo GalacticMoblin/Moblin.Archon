@@ -29,7 +29,7 @@ Requires sv_cheats. Be Ion/Ion Prime and run ```script GiveArchon()``` to give t
 
 - Fires a massive, heavy ball of electricity that discharges on impact.
 
-### Contributors
+## Contributors
 - GalacticMoblin / Programmer, Playtester, Designer
 - 2009 Memes / Playtester, Designer
 - Dinorush / Programmer
