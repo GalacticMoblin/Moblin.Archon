@@ -24,3 +24,7 @@ Requires sv_cheats. Be Ion/Ion Prime and run ```script GiveArchon()``` to give t
 *Utility:* Tesla Node
 
 - Deploys a node that creates a damaging electric field around itself.
+
+*Core:* Storm Core
+
+- Fires a massive, heavy ball of electricity that discharges on impact.
