@@ -28,3 +28,11 @@ Requires sv_cheats. Be Ion/Ion Prime and run ```script GiveArchon()``` to give t
 *Core:* Storm Core
 
 - Fires a massive, heavy ball of electricity that discharges on impact.
+
+### Contributors
+- GalacticMoblin / Programmer, Playtester, Designer
+- 2009 Memes / Playtester, Designer
+- Dinorush / Programmer
+- Anonymous
+
+Thanks to everyone who helped with fixes and giving this a try.
