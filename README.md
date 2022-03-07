@@ -5,7 +5,7 @@
 Implements the Archon Titan based off of cut content. (Special Thanks to 2009 Memes and Dinorush)
 
 ### Activation
-Requires enablinh ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArchon()``` to give the loadout to the first player. Player index can be specified if desired, e.g. Give Archon to player 3: ```script GiveArchon(2)```.
+Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArchon()``` to give the loadout to the first player. Player index can be specified if desired, e.g. Give Archon to player 3: ```script GiveArchon(2)```.
 
 ## Loadout
 
