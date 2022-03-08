@@ -35,3 +35,4 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 - Dinorush / Programmer
 
 Thanks to everyone who helped with fixes and giving this a try.
+(Particular thanks to The Peepeepoopoo Man and Dinorush for helping fix stuff I couldn't)
