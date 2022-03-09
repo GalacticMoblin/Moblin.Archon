@@ -1,5 +1,7 @@
 # Archon
 
+<img src="https://user-images.githubusercontent.com/100473309/157470535-2e49fab4-da3a-4798-b0d5-b4933f818de6.png" width="250" height="250">
+
 **REQUIRED BY SERVER AND CLIENT**
 
 Implements the Archon Titan based off of cut content. (Special Thanks to 2009 Memes and Dinorush)
@@ -16,6 +18,7 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 *Offensive:* Charge Ball
 
 - Fires a powerful electric ball, fully charge to fire three slightly weaker shots at once.
+
 
 *Defensive:* Shock Shield
 
