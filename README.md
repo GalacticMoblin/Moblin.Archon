@@ -42,4 +42,4 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 
 Thanks to everyone who helped with fixes and giving this a try.
 
-(Particular thanks to The Peepeepoopoo Man and Dinorush for helping fix stuff I couldn't)
+(Particular thanks to The Peepeepoopoo Man, Spoon and Dinorush for helping fix stuff I couldn't)
