@@ -37,6 +37,8 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 - 2009 Memes / Playtester, Designer
 - Dinorush / Programmer
 - EXRILL / Custom Particles
+- The Peepeepoopoo man / Programming Support
+- Spoon / Programmer
 
 Thanks to everyone who helped with fixes and giving this a try.
 
