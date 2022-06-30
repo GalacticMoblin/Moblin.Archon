@@ -34,7 +34,7 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 
 ## Contributors
 - GalacticMoblin / Programmer, Playtester, Gameplay Designer, UI Designer
-- 2009 Memes / Playtester, Designer
+- 2009 Memes / Playtester, UI Designer
 - Dinorush / Programmer
 - EXRILL / Custom Particles
 - The Peepeepoopoo man / Programming Support
