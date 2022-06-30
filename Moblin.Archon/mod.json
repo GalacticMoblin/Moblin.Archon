@@ -1,0 +1,59 @@
+{
+    "Name": "Moblin.Archon",
+    "Description": "Implements the Archon Titan based off of cut content. (Special Thanks to 2009 Memes, Dinorush, Peepeepoopoo and EXRILL)",
+    "LoadPriority": 1,
+    "RequiredOnClient": true,
+    "Version": "1.3.1",
+
+    "Scripts": [
+        {
+            "Path": "weapons/mp_titancore_storm_core.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "weapons/_storm_ball.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "weapons/_arc_pylon_field.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "weapons/mp_titanweapon_charge_ball.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "weapons/mp_titanweapon_tesla_node.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "weapons/mp_titanweapon_shock_shield.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "weapons/mp_titanweapon_arc_cannon.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "weapons/_archon_cannon.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+        },
+        {
+            "Path": "sh_archon_util.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+            "ClientCallback": {
+                "After": "ArchonPrecache"
+            },
+            "ServerCallback": {
+                "After": "ArchonPrecache"
+            }
+        },
+        {
+          "Path": "PrimeTitanPlus.nut",
+          "RunOn": "SERVER || CLIENT",
+          "ServerCallback": {
+              "After": "PrimeTitanPlus_Init"
+          }
+        },
+    ]
+}
