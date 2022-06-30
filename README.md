@@ -33,7 +33,7 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 - Fires a massive, heavy ball of electricity that discharges on impact.
 
 ## Contributors
-- GalacticMoblin / Programmer, Playtester, Designer
+- GalacticMoblin / Programmer, Playtester, Gameplay Designer, UI Designer
 - 2009 Memes / Playtester, Designer
 - Dinorush / Programmer
 - EXRILL / Custom Particles
