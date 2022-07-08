@@ -281,7 +281,7 @@ function StormCoreFieldDamage( entity weapon, entity bolt, vector origin )
 		{
 			if ( enemy.GetTeam() == weapon.GetOwner().GetTeam() )
 				continue
-			
+
 			// nothing is blocking LOS
 			if ( TraceLineSimple(origin, enemy.GetCenter(), enemy) == 1.0 )
 			{
@@ -441,6 +441,11 @@ void function StormCore_DamagedTarget( entity target, var damageInfo )
     {
         DamageInfo_SetDamage( damageInfo, 0 )
     }
+
+		const ARC_TITAN_EMP_DURATION			= 0.35
+		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+		StatusEffect_AddTimed( target, eStatusEffect.emp, 1.0, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 }
 
 void function StormCoreSmokescreen( entity bolt, asset fx, entity owner )

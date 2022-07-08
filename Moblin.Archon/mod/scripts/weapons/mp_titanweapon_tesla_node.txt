@@ -46,7 +46,8 @@ WeaponData
 	"damage_type" 									"burn"
 
 	"critical_hit"									"0"
-	"grenade_show_indicator_to_owner"				"0"
+	//"show_grenade_indicator" 						"1"
+	//"grenade_show_indicator_to_owner"				"1"
 
 	MP_BASE
 	{
@@ -126,6 +127,9 @@ WeaponData
 	"spread_stand_ads"   							"0"
 
 	"ammo_suck_behavior"							"offhand_weapons"
+
+	"aimassist_disable_hipfire_humansonly"			"1"
+	"aimassist_disable_ads_humansonly"				"1"
 
 	// View Kick
 	"viewkick_spring" 								"pistol"

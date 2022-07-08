@@ -206,7 +206,12 @@ void function ArcCannonOnDamage( entity ent, var damageInfo )
 		if ( soul != null )
 			entToSlow = soul
 		//StatusEffect_AddTimed( entToSlow, eStatusEffect.move_slow, 0.5, 2.0, 1.0 )
-		StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 2.0, 1.0 )
+		//StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 2.0, 1.0 )
+
+		const ARC_TITAN_EMP_DURATION			= 0.35
+		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+		StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.2*damageMultiplier, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 
 		entity offhandWeaponRI = attacker.GetOffhandWeapon( OFFHAND_RIGHT )
 		entity offhandWeaponAR = attacker.GetOffhandWeapon( OFFHAND_ANTIRODEO )

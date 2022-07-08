@@ -59,7 +59,6 @@ WeaponData
 	"damage_type" 									"bullet"
 	"damage_flags"									"DF_STOPS_TITAN_REGEN | DF_BULLET | DF_NO_SELF_DAMAGE | DF_KNOCK_BACK"
 
-
 	"damage_near_distance"							"800"		//Start of Falloff
 	"damage_far_distance" 							"2300" //Max Range / End of Falloff
 
@@ -67,32 +66,32 @@ WeaponData
 	"damage_far_value"								"90" //Min Damage
 
 	"damage_near_value_titanarmor"					"900" //Max Damage
-	"damage_far_value_titanarmor" 					"700" //Min Damage
+	"damage_far_value_titanarmor" 					"800" //Min Damage
 
 
 
-		// Damage - When Used by NPCs
-		"npc_damage_near_value"   						"80"
-		"npc_damage_far_value"							"80"
-		"npc_damage_near_distance"						"200"
-		"npc_damage_far_distance" 						"2300"
-		"npc_damage_near_value_titanarmor"					"600"
-		"npc_damage_far_value_titanarmor" 					"600"
+	// Damage - When Used by NPCs
+	"npc_damage_near_value"   						"80"
+	"npc_damage_far_value"							"80"
+	"npc_damage_near_distance"						"800"
+	"npc_damage_far_distance" 						"2300"
+	"npc_damage_near_value_titanarmor"					"700"
+	"npc_damage_far_value_titanarmor" 					"700"
 
-		// NPC
-		"npc_min_engage_range_heavy_armor"				"500"
-		"npc_max_engage_range_heavy_armor"				"3000"
-		"npc_min_range"   								"0"
-		"npc_max_range"   								"4000"
+	// NPC
+	"npc_min_engage_range_heavy_armor"				"500"
+	"npc_max_engage_range_heavy_armor"				"2300"
+	"npc_min_range"   								"0"
+	"npc_max_range"   								"4000"
 
-		"npc_min_burst"   								"1"
-		"npc_max_burst"   								"1"
-		"npc_rest_time_between_bursts_min"				"3.5"
-		"npc_rest_time_between_bursts_max"				"4"
+	"npc_min_burst"   								"1"
+	"npc_max_burst"   								"1"
+	"npc_rest_time_between_bursts_min"				"3.5"
+	"npc_rest_time_between_bursts_max"				"4"
 
-		"npc_vortex_block"								"0"
+	"npc_vortex_block"								"0"
 
-		"damage_heavyarmor_nontitan_scale"				"0.5"
+	"damage_heavyarmor_nontitan_scale"				"0.5"
 
 
 	"critical_hit"									"1"

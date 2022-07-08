@@ -219,8 +219,8 @@ WeaponData
 		{
 			//5 Split Balls
 			//"charge_time" 									"1.25"
-			"damage_near_value_titanarmor"					"420" //Contact damage
-			"damage_far_value_titanarmor" 					"420" //Contact damage
+			"damage_near_value_titanarmor"					"*0.72" //Contact damage
+			"damage_far_value_titanarmor" 					"*0.72" //Contact damage
 		}
 	}
 

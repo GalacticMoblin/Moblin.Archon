@@ -243,10 +243,13 @@ void function OnArcPylonField_DamagedEntity( entity target, var damageInfo )
 	if ( !IsAlive( target ) )
 		return
 
-	// entity titan = DamageInfo_GetAttacker( damageInfo )
+	entity titan = DamageInfo_GetAttacker( damageInfo )
+	float outputDamage = DamageInfo_GetDamage( damageInfo )
 
-	// if ( !IsValid( titan ) )
-	// 	 return
+	//print("TESLA DAMAGE: " + outputDamage)
+
+	if ( !IsValid( titan ) )
+		return
 
 	local className = target.GetClassName()
 	if ( target.IsProjectile() || className == "npc_turret_sentry" )
@@ -261,30 +264,24 @@ void function OnArcPylonField_DamagedEntity( entity target, var damageInfo )
 	if ( DamageInfo_GetCustomDamageType( damageInfo ) & DF_DOOMED_HEALTH_LOSS )
 		return
 
-	if ( target.IsPlayer() )
-	{
-        StatusEffect_AddTimed( target, eStatusEffect.move_slow, 0.0, 0.01, 0.25 )
-		// if ( !titan.IsPlayer() && IsArcTitan( titan ) )
-		// {
-		// 	if ( !titan.s.electrocutedPlayers.contains( target ) )
-		// 		titan.s.electrocutedPlayers.append( target )
-		// }
+	float slowMultiplier = GraphCapped( outputDamage, 0, DAMAGE_AGAINST_TITANS, DAMAGE_AGAINST_TITANS / 2, DAMAGE_AGAINST_TITANS )
 
-		// const ARC_TITAN_SCREEN_EFFECTS 			= 0.085
-		// const ARC_TITAN_EMP_DURATION			= 0.35
-		// const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+	StatusEffect_AddTimed( target, eStatusEffect.move_slow, 0.25, 0.01, 0.25 )
 
-		// local attachID 	= titan.LookupAttachment( "hijack" )
-		// local origin 	= titan.GetAttachmentOrigin( attachID )
-		// local distSqr 	= DistanceSqr( origin, target.GetOrigin() )
+	const ARC_TITAN_SCREEN_EFFECTS 			= 0.085
+	const ARC_TITAN_EMP_DURATION			= 0.35
+	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
 
-		// local minDist 	= ARC_TITAN_EMP_FIELD_INNER_RADIUS_SQR
-		// local maxDist 	= ARC_TITAN_EMP_FIELD_RADIUS_SQR
-		// local empFxHigh = ARC_TITAN_SCREEN_EFFECTS
-		// local empFxLow 	= ( ARC_TITAN_SCREEN_EFFECTS * 0.6 )
-		// float screenEffectAmplitude = GraphCapped( distSqr, minDist, maxDist, empFxHigh, empFxLow )
+	local attachID 	= titan.LookupAttachment( "" )
+	local origin 	= titan.GetAttachmentOrigin( attachID )
+	local distSqr 	= Distance( origin, target.GetOrigin() )
 
-		// StatusEffect_AddTimed( target, eStatusEffect.emp, screenEffectAmplitude, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
-	}
+	local minDist 	= ARC_TITAN_EMP_FIELD_INNER_RADIUS_SQR
+	local maxDist 	= ARC_TITAN_EMP_FIELD_RADIUS_SQR
+	local empFxHigh = ARC_TITAN_SCREEN_EFFECTS
+	local empFxLow 	= ( ARC_TITAN_SCREEN_EFFECTS * 0.6 )
+	float screenEffectAmplitude = GraphCapped( distSqr, ARC_TITAN_EMP_FIELD_INNER_RADIUS, ARC_TITAN_EMP_FIELD_RADIUS, empFxHigh, empFxLow )
+
+	StatusEffect_AddTimed( target, eStatusEffect.emp, screenEffectAmplitude, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 }
 #endif

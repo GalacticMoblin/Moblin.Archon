@@ -59,7 +59,7 @@ void function MpTitanAbilityArcPylon_Init()
 
 	#if SERVER
 		file.ArcPylonsIdx = CreateScriptManagedEntArray()
-		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_arc_pylon, ArcPylon_DamagedPlayerOrNPC )
+		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_tesla_node, ArcPylon_DamagedPlayerOrNPC )
 	#endif
 }
     void function OnWeaponOwnerChanged_titanweapon_Arc_pylon( entity weapon, WeaponOwnerChangedParams changeParams )
@@ -167,11 +167,11 @@ function DeployArcPylon( entity projectile )
 
 	entity tower = CreatePropScript( LASER_TRIP_MODEL, origin, angles, SOLID_VPHYSICS )
 	tower.kv.collisionGroup = TRACE_COLLISION_GROUP_BLOCK_WEAPONS
-	tower.EnableAttackableByAI( 20, 0, AI_AP_FLAG_NONE )
+	//tower.EnableAttackableByAI( 20, 0, AI_AP_FLAG_NONE )
 	SetTargetName( tower, "Laser Tripwire Base" )
 	tower.SetMaxHealth( 500000 )
 	tower.SetHealth( 500000 )
-	tower.SetTakeDamageType( DAMAGE_YES )
+	tower.SetTakeDamageType( DAMAGE_NO )
 	tower.SetDamageNotifications( true )
 	tower.SetDeathNotifications( true )
 	tower.SetArmorType( ARMOR_TYPE_HEAVY )
@@ -190,9 +190,9 @@ function DeployArcPylon( entity projectile )
 	string noSpawnIdx = CreateNoSpawnArea( TEAM_INVALID, team, origin, LASER_TRIP_BUILD_TIME + LASER_TRIP_LIFETIME, LASER_TRIP_OUTER_RADIUS )
 
 	SetTeam( tower, team )
-	SetObjectCanBeMeleed( tower, true )
+	SetObjectCanBeMeleed( tower, false )
 	SetVisibleEntitiesInConeQueriableEnabled( tower, true )
-    AddEntityCallback_OnDamaged( tower, OnArcPylonBodyDamaged )
+    //AddEntityCallback_OnDamaged( tower, OnArcPylonBodyDamaged )
 	SetCustomSmartAmmoTarget( tower, false )
 	thread TrapDestroyOnRoundEnd( owner, tower )
 
@@ -345,5 +345,42 @@ void function ArcPylon_DamagedPlayerOrNPC( entity ent, var damageInfo )
 		else
 		 	EmitSoundOnEntityOnlyToPlayer( ent, ent, "flesh_explo_med_3p_vs_1p" )
 	}
+
+	if ( !IsAlive( ent ) )
+		return
+
+	entity titan = DamageInfo_GetAttacker( damageInfo )
+
+	if ( !IsValid( titan ) )
+		return
+
+	local className = ent.GetClassName()
+	if ( ent.IsProjectile() || className == "npc_turret_sentry" )
+	{
+		DamageInfo_SetDamage( damageInfo, 0 ) // Won't damage things hurt by AoE damage like Satchels and Tethers
+		return
+	}
+
+	if ( DamageInfo_GetDamage( damageInfo ) <= 0 )
+		return
+
+	if ( DamageInfo_GetCustomDamageType( damageInfo ) & DF_DOOMED_HEALTH_LOSS )
+		return
+
+	StatusEffect_AddTimed( ent, eStatusEffect.move_slow, 0.1, 0.25, 0.0 )
+
+	const ARC_TITAN_SCREEN_EFFECTS 			= 0.8
+	const ARC_TITAN_EMP_DURATION			= 0.35
+	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+	entity inflictor = DamageInfo_GetInflictor( damageInfo )
+	local origin 	   = inflictor.GetOrigin()
+	local distSqr 	 = Distance( origin, ent.GetOrigin() )
+
+	local empFxHigh = ARC_TITAN_SCREEN_EFFECTS
+	local empFxLow 	= ( ARC_TITAN_SCREEN_EFFECTS * 0.15 )
+	float screenEffectAmplitude = GraphCapped( distSqr, ARC_TITAN_EMP_FIELD_INNER_RADIUS, ARC_TITAN_EMP_FIELD_RADIUS, empFxHigh, empFxLow )
+
+	StatusEffect_AddTimed( ent, eStatusEffect.emp, screenEffectAmplitude, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 }
 #endif

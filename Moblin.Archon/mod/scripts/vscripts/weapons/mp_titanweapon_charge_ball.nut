@@ -131,6 +131,8 @@ void function OnWeaponChargeEnd_MpTitanWeaponArcball2( entity weapon )
 
 void function ChargeBallOnDamage( entity ent, var damageInfo )
 {
-	//vector pos = DamageInfo_GetDamagePosition( damageInfo )
-	//entity attacker = DamageInfo_GetAttacker( damageInfo )
+	const ARC_TITAN_EMP_DURATION			= 0.35
+	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 }

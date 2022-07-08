@@ -322,8 +322,8 @@ function FireArchonCannon( entity weapon, WeaponPrimaryAttackParams attackParams
 	foreach ( result in results )
 	{
 		entity visibleEnt = result.ent
-		print(result.ent)
-		print(result.visibleHitbox)
+		//print(result.ent)
+		//print(result.visibleHitbox)
 	}
 
 
@@ -599,7 +599,7 @@ function ZapTarget( zapInfo, target, beamStartPos, beamEndPos, chainNum = 1 )
 	thread CreateArchonCannonBeam( zapInfo.weapon, target, beamStartPos, beamEndPos, zapInfo.player, ARCHON_CANNON_BEAM_LIFETIME, zapInfo.radius, boltWidth, 5, true, firstBeam )
 
 	#if SERVER
-		print(file.canDestroyMissiles)
+		//print(file.canDestroyMissiles)
 		local isMissile = ( target.GetClassName() == "rpg_missile" )
 		if ( !isMissile )
 			wait ARCHON_CANNON_FORK_DELAY
@@ -686,8 +686,17 @@ function ZapTarget( zapInfo, target, beamStartPos, beamEndPos, chainNum = 1 )
 				float dist = Distance( owner.GetOrigin(), target.GetOrigin() )
 				maxDamageAmount = GraphCapped( dist, farDist, nearDist, damageMin, damageMax )
 				float arcWeaponCharge = GraphCapped( zapInfo.chargeFrac, 0, chargeRatio/*0.85*/, 0, 1 )
-				damageAmount = maxDamageAmount * arcWeaponCharge
-				print("DAMAGE OUTPUT: " + damageAmount)
+				if ( owner.IsNPC() )
+				{
+					damageAmount = maxDamageAmount
+					print("DAMAGE OUTPUT: " + damageAmount)
+				}
+				else
+				{
+					damageAmount = maxDamageAmount * arcWeaponCharge
+					print("DAMAGE OUTPUT: " + damageAmount)
+				}
+
 			}
 			else
 			{
@@ -1000,7 +1009,7 @@ array<entity> function GetArcCannonTargetsInRange( vector origin, int team, enti
 	{
 		if(target.GetTargetName() == "Arc Ball" && target.GetOwner() == weapon.GetWeaponOwner())
 		{
-			print("Range extended")
+			//print("Range extended")
 			titanDistSq = ARCHON_CANNON_TITAN_RANGE_CHAIN * ARCHON_CANNON_TITAN_RANGE_CHAIN * 1.5
 			distSq = ARCHON_CANNON_RANGE_CHAIN * ARCHON_CANNON_RANGE_CHAIN * 1.5
 		}

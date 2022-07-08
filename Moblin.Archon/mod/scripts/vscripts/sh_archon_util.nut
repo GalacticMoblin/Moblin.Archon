@@ -253,7 +253,7 @@ function CreateClientArcBeam_Archon( weapon, endPos, lifeDuration, target )
 array<entity> function DamageShieldsInRadiusOnEntity( entity weapon, entity inflictor, float radius, float damage )
 {
 	array<entity> damagedEnts = [] // used so that we only damage a shield once per function call
-	array<string> shieldClasses = [ "mp_titanweapon_vortex_shield", "mp_titanweapon_shock_shield", "mp_titanweapon_heat_shield" ] // add shields that are like vortex shield/heat shield to this, they seem to be exceptions?
+	array<string> shieldClasses = [ "mp_titanweapon_vortex_shield", "mp_titanweapon_shock_shield", "mp_titanweapon_heat_shield", "mp_titanability_brute4_bubble_shield" ] // add shields that are like vortex shield/heat shield to this, they seem to be exceptions?
 
 	// not ideal
 	foreach ( entity shield in GetEntArrayByClass_Expensive( "vortex_sphere" ) )

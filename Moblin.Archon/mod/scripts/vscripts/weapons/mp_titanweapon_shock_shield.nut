@@ -29,11 +29,6 @@ const SHOCK_HOLD_EFFECT = $"arcTrap_CH_arcs_large"
 const SHOCK_RELEASE_EFFECT_FP = $"P_wpn_muzzleflash_epg_FP"
 const SHOCK_RELEASE_EFFECT = $"P_wpn_muzzleflash_epg"
 
-const TITAN_PUNCH_KNOCKBACK_SCALE = 760.0
-const TITAN_SWORD_KNOCKBACK_SCALE_MP = 400.0
-const TITAN_SWORD_KNOCKBACK_SCALE_MP_SWORD_CORE = 100.0
-const TITAN_SWORD_KNOCKBACK_SCALE_SP = 300.0
-
 const VortexIgnoreClassnames = {
 	["mp_titancore_flame_wave"] = true,
 	["mp_ability_grapple"] = true,
@@ -75,6 +70,13 @@ function ShockShieldPrecache()
 	PrecacheParticleSystem( $"wpn_vortex_shield_impact_mod_arc" )
 	PrecacheParticleSystem( $"wpn_muzzleflash_vortex_mod_CP_FP_arc" )
 
+	PrecacheParticleSystem( $"wpn_vortex_chargingCP_mod_FP_bftb" )
+	PrecacheParticleSystem( $"wpn_vortex_chargingCP_mod_FP_replay_bftb" )
+	PrecacheParticleSystem( $"wpn_vortex_chargingCP_mod_bftb" )
+	PrecacheParticleSystem( $"wpn_vortex_shield_impact_mod_bftb" )
+	PrecacheParticleSystem( $"wpn_muzzleflash_vortex_mod_CP_FP_bftb" )
+
+
 	PrecacheParticleSystem( $"P_impact_exp_emp_med_air" )
 
 
@@ -86,15 +88,15 @@ void function OnWeaponOwnerChanged_titanweapon_shock_shield( entity weapon, Weap
 
 	if ( !( "initialized" in weapon.s ) )
 	{
-		weapon.s.fxChargingFPControlPoint <- $"wpn_vortex_chargingCP_titan_FP"
-		weapon.s.fxChargingFPControlPointReplay <- $"wpn_vortex_chargingCP_titan_FP_replay"
-		weapon.s.fxChargingControlPoint <- $"wpn_vortex_chargingCP_titan"
-		weapon.s.fxBulletHit <- $"wpn_vortex_shield_impact_titan"
+		weapon.s.fxChargingFPControlPoint <- $"wpn_vortex_chargingCP_mod_FP_arc"
+		weapon.s.fxChargingFPControlPointReplay <- $"wpn_vortex_chargingCP_mod_FP_replay_arc"
+		weapon.s.fxChargingControlPoint <- $"wpn_vortex_chargingCP_mod_arc"
+		weapon.s.fxBulletHit <- $"wpn_vortex_shield_impact_mod_arc"
 
-		weapon.s.fxChargingFPControlPointBurn <- $"wpn_vortex_chargingCP_mod_FP_arc"
-		weapon.s.fxChargingFPControlPointReplayBurn <- $"wpn_vortex_chargingCP_mod_FP_replay_arc"
-		weapon.s.fxChargingControlPointBurn <- $"wpn_vortex_chargingCP_mod_arc"
-		weapon.s.fxBulletHitBurn <- $"wpn_vortex_shield_impact_mod_arc"
+		weapon.s.fxChargingFPControlPointBurn <- $"wpn_vortex_chargingCP_mod_FP_bftb"
+		weapon.s.fxChargingFPControlPointReplayBurn <- $"wpn_vortex_chargingCP_mod_FP_replay_bftb"
+		weapon.s.fxChargingControlPointBurn <- $"wpn_vortex_chargingCP_mod_bftb"
+		weapon.s.fxBulletHitBurn <- $"wpn_vortex_shield_impact_mod_bftb"
 
 		weapon.s.fxElectricalExplosion <- $"P_impact_exp_emp_med_air"
 
@@ -122,8 +124,7 @@ void function OnWeaponActivate_titanweapon_shock_shield( entity weapon )
 	}
 
 	#if SERVER
-		if ( weapon.GetWeaponSettingBool( eWeaponVar.is_burn_mod ) )
-			thread AmpedVortexRefireThink( weapon )
+		thread AmpedVortexRefireThink( weapon )
 	#endif
 }
 
@@ -131,8 +132,7 @@ void function OnWeaponDeactivate_titanweapon_shock_shield( entity weapon )
 {
 	EndVortex( weapon )
 
-	if ( weapon.GetWeaponSettingBool( eWeaponVar.is_burn_mod ) )
-		weapon.Signal( "DisableAmpedVortex" )
+	weapon.Signal( "DisableAmpedVortex" )
 }
 
 void function OnWeaponCustomActivityStart_titanweapon_shock_shield( entity weapon )
@@ -166,7 +166,6 @@ function StartVortex( entity weapon )
 
 	//ApplyActivationCost( weapon, ACTIVATION_COST_FRAC )
 
-	local hasBurnMod = weapon.GetWeaponSettingBool( eWeaponVar.is_burn_mod )
 	if ( weapon.GetWeaponChargeFraction() < 1 )
 	{
 		weapon.s.hadChargeWhenFired = true
@@ -235,7 +234,7 @@ function ApplyActivationCost( entity weapon, float frac )
 	{
 		#if SERVER
 		weapon.ForceRelease()
-		
+
 		weapon.SetWeaponChargeFraction( 1.0 )
 		#endif
 	}
@@ -306,52 +305,21 @@ bool function OnWeaponVortexHitProjectile_titanweapon_shock_shield( entity weapo
 
 var function OnWeaponPrimaryAttack_titanweapon_shock_shield( entity weapon, WeaponPrimaryAttackParams attackParams )
 {
+	string attackSound1p = "vortex_shield_end_1P"
+	string attackSound3p = "vortex_shield_end_3P"
 
-	local hasBurnMod = weapon.GetWeaponSettingBool( eWeaponVar.is_burn_mod )
-	int bulletsFired
-	if ( hasBurnMod )
-		bulletsFired = 1
-	else
-		bulletsFired = VortexPrimaryAttack( weapon, attackParams )
-	// only play the release/refire endcap sounds if we started with charge remaining
-	if ( weapon.s.hadChargeWhenFired )
-	{
-		string attackSound1p = "vortex_shield_end_1P"
-		string attackSound3p = "vortex_shield_end_3P"
-		if ( bulletsFired )
-		{
-			weapon.s.lastFireTime = Time()
-			if ( hasBurnMod )
-			{
-				attackSound1p = "Vortex_Shield_Deflect_Amped"
-				attackSound3p = "Vortex_Shield_Deflect_Amped"
-			}
-			else
-			{
-				attackSound1p = "vortex_shield_throw_1P"
-				attackSound3p = "vortex_shield_throw_3P"
-			}
-		}
+	attackSound1p = "Vortex_Shield_Deflect_Amped"
+	attackSound3p = "Vortex_Shield_Deflect_Amped"
 
-		//printt( "SFX attack sound:", attackSound )
-		weapon.EmitWeaponSound_1p3p( attackSound1p, attackSound3p )
-		thread OnShieldDestroyed(weapon, attackParams)
-	}
+	weapon.EmitWeaponSound_1p3p( attackSound1p, attackSound3p )
+	thread OnShieldDestroyed(weapon, attackParams)
 
 	DestroyVortexSphereFromVortexWeapon( weapon )  // sphere ent holds networked ammo count, destroy it after predicted firing is done
 
-	if ( hasBurnMod )
-	{
-		FadeOutSoundOnEntity( weapon, "vortex_shield_start_amped_1P", 0.15 )
-		FadeOutSoundOnEntity( weapon, "vortex_shield_start_amped_3P", 0.15 )
-	}
-	else
-	{
-		FadeOutSoundOnEntity( weapon, "vortex_shield_start_1P", 0.15 )
-		FadeOutSoundOnEntity( weapon, "vortex_shield_start_3P", 0.15 )
-	}
+	FadeOutSoundOnEntity( weapon, "vortex_shield_start_amped_1P", 0.15 )
+	FadeOutSoundOnEntity( weapon, "vortex_shield_start_amped_3P", 0.15 )
 
-	return bulletsFired
+	return true
 }
 
 
@@ -371,11 +339,7 @@ void function OnClientAnimEvent_titanweapon_shock_shield( entity weapon, string 
 {
 	if ( name == "muzzle_flash" )
 	{
-		asset fpEffect
-		if ( weapon.GetWeaponSettingBool( eWeaponVar.is_burn_mod ) )
-			fpEffect = $"wpn_muzzleflash_vortex_mod_CP_FP_arc"
-		else
-			fpEffect = $"wpn_muzzleflash_vortex_titan_CP_FP"
+		asset fpEffect = $"wpn_muzzleflash_vortex_mod_CP_FP_arc"
 
 		int handle
 		if ( GetLocalViewPlayer() == weapon.GetWeaponOwner() )
@@ -419,10 +383,6 @@ bool function OnWeaponChargeBegin_titanweapon_shock_shield( entity weapon )
 
 void function OnWeaponChargeEnd_titanweapon_shock_shield( entity weapon )
 {
-	// if ( weapon.HasMod( "slow_recovery_vortex" ) )
-	// {
-	// 	weapon.SetWeaponChargeFraction( 1.0 )
-
 	float activationCost = ACTIVATION_COST_FRAC
 
 	if ( weapon.HasMod( "immobilizer_shield" ) )
@@ -431,12 +391,8 @@ void function OnWeaponChargeEnd_titanweapon_shock_shield( entity weapon )
 	}
 
 	ApplyActivationCost( weapon, activationCost )
-	// }
-	entity weaponOwner = weapon.GetWeaponOwner()
 
-	#if SERVER
-	//weapon.SetWeaponChargeFraction( 1.0 )
-	#endif
+	entity weaponOwner = weapon.GetWeaponOwner()
 	weapon.StopWeaponEffect( SHOCK_HOLD_EFFECT_FP, SHOCK_HOLD_EFFECT )
 	weapon.StopWeaponEffect( SHOCK_ARM_EFFECT_FP, SHOCK_ARM_EFFECT )
 	weapon.StopWeaponSound("EMP_Titan_Electrical_Field")
@@ -451,7 +407,6 @@ bool function OnWeaponAttemptOffhandSwitch_titanweapon_shock_shield( entity weap
 	entity soul = weaponOwner.GetTitanSoul()
 	Assert( IsValid( soul ) )
 	entity activeWeapon = weaponOwner.GetActiveWeapon()
-	float minEnergyCost = 0.1
 
 	float activationCost = ACTIVATION_COST_FRAC
 
@@ -461,15 +416,7 @@ bool function OnWeaponAttemptOffhandSwitch_titanweapon_shock_shield( entity weap
 	}
 
 	allowSwitch = weapon.GetWeaponChargeFraction() <= 1 - activationCost
-	if( !allowSwitch )
-	{
-		// Play SFX and show some HUD feedback here...
-		#if CLIENT
-			//FlashEnergyNeeded_Bar( 100 )
-		#endif
-	}
-	// Return whether or not we can bring up the vortex
-	// Only allow it if we have enough charge to do anything
+
 	return allowSwitch
 }
 
@@ -499,8 +446,13 @@ void function ShockShieldOnDamage( entity ent, var damageInfo )
 		if ( soul != null )
 			entToSlow = soul
 
+		const ARC_TITAN_EMP_DURATION			= 0.35
+		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.move_slow, 0.5, 1.0, 1.0 )
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 1.0, 1.0 )
+		StatusEffect_AddTimed( ent, eStatusEffect.emp, 1.0, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 	}
 
 	if ( false )//ent.IsPlayer() || ent.IsNPC() )
@@ -516,122 +468,19 @@ void function ShockShieldOnDamage( entity ent, var damageInfo )
 		if (!IsValid(entToSlow))
 			return
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.move_slow, 0.5, 1.0, 1.0 )
-		//StatusEffect_AddTimed( entToSlow, eStatusEffect.turn_slow, 0.45, 1.2, 1.0 )
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 1.0, 1.0 )
-		StatusEffect_AddTimed( entToSlow, eStatusEffect.emp, 1.0, 1.0, 1.0 )
+
+		const ARC_TITAN_EMP_DURATION			= 0.35
+		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+		StatusEffect_AddTimed( entToSlow, eStatusEffect.emp, 0.25, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 
 
-		print("ENEMY: " + ent)
-		print("USER: " + attacker)
+		//print("ENEMY: " + ent)
+		//print("USER: " + attacker)
 
 
-		/*entity offhandWeapon = attacker.GetOffhandWeapon( OFFHAND_ORDNANCE )
 
-		if ( offhandWeapon.GetWeaponPrimaryClipCount() + 7 > 100 )
-		{
-			offhandWeapon.SetWeaponPrimaryClipCount( 100 )
-		}
-		else
-		{
-			offhandWeapon.SetWeaponPrimaryClipCount( offhandWeapon.GetWeaponPrimaryClipCount() + 7)
-		}*/
 
 	}
-}
-
-function ArchonAttackKnockback( entity titan, entity meleeWeapon, entity enemyTitan, vector damageOrigin )
-{
-#if SERVER
-
-	if ( IsTitanWithinBubbleShield( enemyTitan ) )
-		return
-
-	local hasDashPunch = (titan.PlayerMelee_GetState() == PLAYER_MELEE_STATE_TITAN_DASH_PUNCH)
-
-	// Shove target away:
-	{
-		string settingsFile
-		if ( enemyTitan.IsPlayer() )
-			settingsFile = enemyTitan.GetPlayerSettings()
-		else
-			settingsFile = GetNPCTitanSettingFile( enemyTitan )
-
-		float pushBackScale
-		string meleeWeaponClassName = meleeWeapon.GetWeaponClassName()
-		if ( meleeWeaponClassName == "melee_titan_sword" || meleeWeaponClassName == "melee_titan_sword_AOE" )
-		{
-			if ( IsSingleplayer() )
-			{
-				pushBackScale = TITAN_SWORD_KNOCKBACK_SCALE_SP
-			}
-			else
-			{
-				if ( meleeWeapon.HasMod( "super_charged" ) )
-					pushBackScale = TITAN_SWORD_KNOCKBACK_SCALE_MP_SWORD_CORE
-				else
-					pushBackScale = TITAN_SWORD_KNOCKBACK_SCALE_MP
-			}
-		}
-		else
-		{
-			pushBackScale = TITAN_PUNCH_KNOCKBACK_SCALE
-		}
-
-		vector angles = titan.EyeAngles()
-		vector pushBackVelocity = AnglesToForward( angles ) * pushBackScale
-
-		if ( hasDashPunch )
-			pushBackVelocity = pushBackVelocity * 1.25
-
-		local directionVector = enemyTitan.GetOrigin() - titan.GetOrigin()
-		if ( DotProduct( directionVector, pushBackVelocity ) < 0 )
-			pushBackVelocity = (pushBackVelocity * -1.0)
-
-		float weaponPushBackScale = meleeWeapon.GetWeaponInfoFileKeyField( "pushback_scale" ) == null ? 1.0 : expect float( meleeWeapon.GetWeaponInfoFileKeyField( "pushback_scale" ) )
-		pushBackVelocity *= weaponPushBackScale
-
-		//Push enemy back first before doing damage to get rid of some dependencies
-		vector targetVelocity
-		targetVelocity = enemyTitan.GetVelocity()
-		targetVelocity += pushBackVelocity
-
-		// Put a floor on the targetVelocity: has to be at least 0.85 of the pushback velocity to be able to push back players far enough
-		// so that their slow melee attack doesn't still connect after being hit by a fast melee.
-		float clampRatio = 0.85
-		if ( ShouldClampTargetVelocity( targetVelocity, pushBackVelocity, clampRatio ) )
-			targetVelocity = pushBackVelocity * clampRatio
-
-		targetVelocity += Vector(0,0,100 )
-		targetVelocity = ClampVerticalVelocity( targetVelocity, TITAN_MELEE_MAX_VERTICAL_PUSHBACK )
-
-		// enemyTitan.SetVelocity( targetVelocity )
-		targetVelocity.z = 150
-		PushEntWithVelocity( enemyTitan, /*Vector(0,0,10000 )*/ targetVelocity )
-
-		//vector backVel = -1*pushBackVelocity
-		//backVel.z = 0
-
-		// titan.SetVelocity( backVel )
-
-		//PushEntWithVelocity( titan, backVel )
-
-		/*if ( enemyTitan.IsPlayer() && enemyTitan.PlayerMelee_IsAttackActive() )
-		{
-			enemyTitan.PlayerMelee_EndAttack()
-		}*/
-	}
-
-	/*int damageAmount = meleeWeapon.GetDamageAmountForArmorType( enemyTitan.GetArmorType() );
-	local damageTable =
-	{
-		scriptType = meleeWeapon.GetWeaponDamageFlags()
-		forceKill = false
-		damageType = DMG_MELEE_ATTACK
-		damageSourceId = meleeWeapon.GetDamageSourceID()
-		origin = damageOrigin
-	}*/
-
-
-	//enemyTitan.TakeDamage( damageAmount, titan, titan, damageTable )
-#endif // #if SERVER
 }

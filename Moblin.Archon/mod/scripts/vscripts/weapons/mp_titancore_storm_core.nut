@@ -48,9 +48,10 @@ bool function OnAbilityCharge_StormWave( entity weapon )
 		entity soul = owner.GetTitanSoul()
 		if ( soul == null )
 			soul = owner
-		StatusEffect_AddTimed( soul, eStatusEffect.move_slow, 0.6, chargeTime, 0 )
-		StatusEffect_AddTimed( soul, eStatusEffect.dodge_speed_slow, 0.6, chargeTime, 0 )
-		StatusEffect_AddTimed( soul, eStatusEffect.damageAmpFXOnly, 1.0, chargeTime, 0 )
+		StatusEffect_AddTimed( owner, eStatusEffect.move_slow, 0.6, chargeTime, 0 )
+		StatusEffect_AddTimed( owner, eStatusEffect.dodge_speed_slow, 0.6, chargeTime, 0 )
+    StatusEffect_AddTimed( owner, eStatusEffect.emp, 0.05, chargeTime*1.5, 0.35 )
+		//StatusEffect_AddTimed( owner, eStatusEffect.damageAmpFXOnly, 1.0, chargeTime, 0 )
 
 		if ( owner.IsPlayer() )
 			owner.SetTitanDisembarkEnabled( false )
@@ -85,10 +86,6 @@ void function OnAbilityChargeEnd_StormWave( entity weapon )
 var function OnWeaponPrimaryAttack_titancore_storm_wave( entity weapon, WeaponPrimaryAttackParams attackParams )
 {
 	OnAbilityStart_TitanCore( weapon )
-
-  #if CLIENT
-    ClientScreenShake( 4.0, 5.0, 5.0, Vector( 0.0, 0.0, 0.0 ) )
-  #endif
 
 	#if SERVER
 	OnAbilityEnd_TitanCore( weapon )
