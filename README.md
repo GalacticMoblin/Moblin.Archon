@@ -34,17 +34,17 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 
 ## Contributors
 - **GalacticMoblin** 
-  - Programmer, Playtester, Gameplay Designer, UI Designer
+  - *Programmer, Playtester, Gameplay Designer, UI Designer, Writer*
 - **Hurb**
-  - Playtester, UI Designer, Concept Artist
+  - *Playtester, UI Designer, Concept Artist, Writer*
 - **Dinorush**
-  - Programmer
+  - *Programmer*
 - **EXRILL**
-  - Custom Particles
+  - *Custom Particles, Audio Support*
 - **The Peepeepoopoo man**
-  - Programming Support
+  - *Programming Support, Framework Developer*
 - **Spoon**
-  - Programmer
+  - *Programmer, Writing Support*
 
 *Special Thanks to the entire RePak Team and MDLShit Team.*
 
