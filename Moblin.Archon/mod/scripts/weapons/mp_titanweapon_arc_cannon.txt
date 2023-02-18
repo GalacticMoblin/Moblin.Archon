@@ -1,9 +1,9 @@
 WeaponData
 {
 	// General
-	"printname"   									"Arc Cannon"
-	"shortprintname"								"Arc Cannon"
-	"description" 									"Zaps with bolts of electricity"
+	"printname"   									"#WPN_TITAN_ARC_CANNON"
+	"shortprintname"								"#WPN_TITAN_ARC_CANNON_SHORT"
+	"description" 									"#WPN_TITAN_ARC_CANNON_DESC"
 	"longdesc"										"#WPN_TITAN_ARC_CANNON_LONGDESC"
 	"weaponClass" 									"titan"
 	"fire_mode"   									"full-auto"
@@ -12,8 +12,8 @@ WeaponData
 	"minimap_reveal_distance"						"32000"
 
 
-	"menu_icon"										"r2_ui/menus/loadout_icons/titan_weapon/titan_weapon_railgun"
-	"hud_icon"										"r2_ui/menus/loadout_icons/titan_weapon/titan_weapon_railgun"
+	"menu_icon"										"archon/hud/arc_cannon"
+	"hud_icon"										"archon/hud/arc_cannon"
 
 
 	// Menu Stats
@@ -23,21 +23,19 @@ WeaponData
 	"stat_rof"										"20"
 
 	// Models
-	"viewmodel"   									"models/weapons/atpov_titan_sniper_rifle/atpov_titan_sniper_rifle.mdl"
-	"playermodel" 									"models/weapons/titan_sniper_rifle/w_titan_sniper_rifle.mdl"
+	"viewmodel"   									"models/weapons/titan_arc_rifle/atpov_titan_arc_rifle.mdl"
+	"playermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
 	"projectilemodel" 									"models/dev/empty_model.mdl"
 	"anim_prefix" 									"ar2"
 
 
 	"OnWeaponActivate" 							"OnWeaponActivate_titanweapon_arc_cannon_archon"
 	"OnWeaponDeactivate"							"OnWeaponDeactivate_titanweapon_arc_cannon_archon"
-	"OnWeaponReload"							"OnWeaponReload_titanweapon_arc_cannon_archon"
 	"OnWeaponOwnerChanged"							"OnWeaponOwnerChanged_titanweapon_arc_cannon_archon"
 	"OnWeaponChargeBegin"							"OnWeaponChargeBegin_titanweapon_arc_cannon_archon"
 	"OnWeaponChargeEnd"							"OnWeaponChargeEnd_titanweapon_arc_cannon_archon"
 	"OnWeaponPrimaryAttack"							"OnWeaponPrimaryAttack_titanweapon_arc_cannon_archon"
 	"OnWeaponNpcPrimaryAttack"						"OnWeaponNpcPrimaryAttack_titanweapon_arc_cannon_archon"
-//	"OnWeaponCooldown"								"OnWeaponCooldown_titanweapon_particle_accelerator"
 	"impulse_force"   								"1000"
 
 
@@ -48,70 +46,53 @@ WeaponData
 	"tracer_effect"   							"P_wpn_arcball_beam"
 	"tracer_effect_first_person"  						"P_wpn_arcball_beam"
 	"impact_effect_table" 							"exp_arc_cannon"
-	"impact_sound" 							"weapon_batterygun_firestart_1p"
+	"impact_sound" 							"MegaTurret_Laser_Fire_3P"
 	"adjust_to_gun_barrel"							"1"
 	"fx_muzzle_flash_view"							"P_wpn_mflash_arcball_FP"
 	"fx_muzzle_flash_world"							"wpn_arc_cannon_electricity"
 	"fx_muzzle_flash_attach"						"muzzle_flash"
 
 	// Damage - When Used by Players
-
 	"damage_type" 									"bullet"
 	"damage_flags"									"DF_STOPS_TITAN_REGEN | DF_BULLET | DF_NO_SELF_DAMAGE | DF_KNOCK_BACK"
 
 	"damage_near_distance"							"800"		//Start of Falloff
-	"damage_far_distance" 							"2300" //Max Range / End of Falloff
+	"damage_far_distance" 							"3000" //Max Range / End of Falloff
 
-	"damage_near_value"   							"120" //Max Damage
-	"damage_far_value"								"90" //Min Damage
+	"damage_near_value"   							"120" //Max Damage //Max Pilot Damage
+	"damage_far_value"								"85" //Min Damage //Min Pilot Damage
 
-	"damage_near_value_titanarmor"					"900" //Max Damage
-	"damage_far_value_titanarmor" 					"800" //Min Damage
-
-
+	"damage_near_value_titanarmor"					"900" //Max Titan Damage
+	"damage_far_value_titanarmor" 					"550" //Min Titan Damage
 
 	// Damage - When Used by NPCs
 	"npc_damage_near_value"   						"80"
 	"npc_damage_far_value"							"80"
 	"npc_damage_near_distance"						"800"
 	"npc_damage_far_distance" 						"2300"
-	"npc_damage_near_value_titanarmor"					"700"
-	"npc_damage_far_value_titanarmor" 					"700"
+	"npc_damage_near_value_titanarmor"					"600"
+	"npc_damage_far_value_titanarmor" 					"600"
 
 	// NPC
 	"npc_min_engage_range_heavy_armor"				"500"
-	"npc_max_engage_range_heavy_armor"				"2300"
+	"npc_max_engage_range_heavy_armor"				"3000"
 	"npc_min_range"   								"0"
 	"npc_max_range"   								"4000"
-
-	"npc_min_burst"   								"1"
-	"npc_max_burst"   								"1"
-	"npc_rest_time_between_bursts_min"				"3.5"
-	"npc_rest_time_between_bursts_max"				"4"
 
 	"npc_vortex_block"								"0"
 
 	"damage_heavyarmor_nontitan_scale"				"0.5"
 
-
 	"critical_hit"									"1"
+	"critical_hit_damage_scale"						"1.5"
 
 	// Ammo
-
-//    	"cooldown_type"                                 "shared_energy_drain"
-//	"shared_energy_charge_cost"						"2"
-//	"ammo_default_total"							"20"
-//	"ammo_stockpile_max"							"20"
-//	"ammo_clip_size"   								"100"
-//	"ammo_clip_reload_max"							"35"
-//	"ammo_min_to_fire_autoreloads"					"500"
 	"ammo_min_to_fire"								"1"
 	"ammo_no_remove_from_stockpile"					"1"
 
 	// Behavior
 	"fire_rate"   									"1.35"//"1"
 	"rechamber_time"  								"0.25"//1.30"
-	//"cooldown_time"									"0.3"
 	"reloadempty_time"								"6.03"
 	"reloadempty_time_late1"						"4.7"
 	"reloadempty_time_late2"						"3.5"
@@ -142,8 +123,6 @@ WeaponData
 	"charge_effect_3p"								"wpn_arc_cannon_charge"
 	"charge_effect_attachment"						"muzzle_flash"
 
-
-
 	// Spread
 	"spread_stand_hip"  							"10"
 	"spread_npc"  									"2"
@@ -158,10 +137,11 @@ WeaponData
 	"viewkick_pitch_softScale"						"1"
 	"viewkick_pitch_hardScale"						"0"
 
-	"viewkick_yaw_base"   							"0"
+	"viewkick_yaw_base"   							"0.0"
 	"viewkick_yaw_random" 							"0.5"
-	"viewkick_yaw_softScale"  						"1"
-	"viewkick_yaw_hardScale"  						"0"
+	"viewkick_yaw_random_innerexclude"				"0.15"
+	"viewkick_yaw_softScale"  						"1.2"
+	"viewkick_yaw_hardScale"  						"0.8"
 
 	"viewkick_roll_base"  							"0.0"
 	"viewkick_roll_randomMin" 						"0.3"
@@ -183,8 +163,6 @@ WeaponData
 	"bob_pitch"   									"1"
 	"bob_yaw" 										"1"
 	"bob_roll"										"-0.75"
-
-	// View Drift
 
 	// Rumble
 	"fire_rumble"									"titan_arc_cannon"
@@ -240,8 +218,16 @@ WeaponData
 	"npc_max_range_secondary" 						"2500"
 	"npc_min_burst"   								"1"
 	"npc_max_burst"   								"1"
+	"npc_pre_fire_delay"							"1.5"
+	"npc_pre_fire_delay_interval"					"3"
 	"rest_time_between_bursts_min"					"2.5"
 	"rest_time_between_bursts_max"					"3.0"
+
+	"npc_fire_at_enemy_defense_time"							"1"
+
+	"npc_charge_time_min"							"1.0"	// for rocketpod animation time
+	"npc_charge_time_max"							"1.0"
+	"npc_clear_charge_if_not_fired"							"1"
 
 	// WeaponED Unhandled Key/Values and custom script Key/Values
 	"sound_dryfire"   								"titan_dryfire"
@@ -265,43 +251,35 @@ WeaponData
 	"npc_vortex_block"								"1"
 
 	// Crosshair
-	"red_crosshair_range" 							"2300"
+	"red_crosshair_range" 							"3000"
+
+	"is_burn_mod"									"0"
 
 	Mods
 	{
-		overcharge
+		chain_reaction //Increases Chains by +2
 		{
-			//overcharge
-		}
-		capacitor
-		{
-			"charge_time" 									"2.5" //for reference was 3 in 10/15 evening playtest
-			"charge_cooldown_time"							"1.0"
-			"charge_cooldown_delay"   						"0.0"
-			//"crosshair_index"								"1"
-			"spread_stand_hip"  							"15"
-			"damage_far_distance" 							"2700"
-			"damage_near_value_titanarmor"					"2000"
-		}
-		splitter
-		{
-			"damage_near_value_titanarmor"					"1900"
-			"damage_far_value_titanarmor" 					"100"
-		}
-		chain_reaction
-		{
-			//"crosshair_index"								"2"
 			"tracer_effect"   							"wpn_arc_cannon_beam_mod"
 			"tracer_effect_first_person"  						"wpn_arc_cannon_beam_mod"
-			//"damage_near_value"   							"*1.1"
-			//"damage_far_value"								"*1.1"
-			//"damage_near_value_titanarmor"					"*1.1"
-			//"damage_far_value_titanarmor" 					"*1.1"
-			"is_burn_mod"		"0"
 		}
-		generator_mod
+		static_feedback
 		{
 			//makes arc cannon replenish abilities
+			"fx_muzzle_flash_view"							"P_wpn_muzzleflash_arcball_st"
+		}
+		fd_crit_multiplier
+		{
+			"critical_hit_damage_scale"						"2.0"
+		}
+		fd_terminator
+		{
+			//Used for Aegis modes only
+		}
+		burn_mod_fd_terminator_active
+		{
+			"is_burn_mod"									"1"
+			"charge_time" 									"*0.67" //33% Charge Time Bonus
+			"hud_icon"										"archon/hud/arc_cannon_terminator"
 		}
 	}
 
@@ -321,7 +299,7 @@ WeaponData
 			isReloading					weapon_is_reloading
 			readyFrac                   progress_ready_to_fire_frac
 			teamColor					crosshair_team_color
-			isAmped						player_is_sprinting
+			isAmped						weapon_is_amped
 			chargeFrac                  player_chargeFrac
 			crosshairMovementX          crosshair_movement_x
 			crosshairMovementY          crosshair_movement_y
@@ -337,7 +315,7 @@ WeaponData
 			isReloading					weapon_is_reloading
 			readyFrac                   progress_ready_to_fire_frac
 			teamColor					crosshair_team_color
-			isAmped						weapon_ammo
+			isAmped						weapon_is_amped
 			chargeFrac                  player_chargeFrac
 		    	clipAmmo					weapon_ammo
 			clipSize					weapon_clipSize
@@ -348,12 +326,11 @@ WeaponData
 		Crosshair_1
 		{
 			"ui"						"ui/crosshair_charge_rifle"
-//			"ui"						"ui/alternator_reticle"
-//			"base_spread"				"10.0"
 			Args
 			{
 				isFiring				weapon_is_firing
 				chargeFrac                  player_chargeFrac
+				isAmped						weapon_is_amped
 			}
 			Element1
 			{
@@ -376,6 +353,7 @@ WeaponData
 			Args
 			{
 				isFiring				weapon_is_firing
+				isAmped						weapon_is_amped
 			}
 		}
 	}

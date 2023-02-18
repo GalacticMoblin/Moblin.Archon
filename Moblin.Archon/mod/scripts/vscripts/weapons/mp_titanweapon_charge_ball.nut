@@ -1,13 +1,13 @@
 untyped
-global function MpTitanweaponArcBall2_Init
-global function OnWeaponPrimaryAttack_weapon_MpTitanWeaponArcball2
-global function OnWeaponChargeBegin_MpTitanWeaponArcball2
-global function OnWeaponChargeEnd_MpTitanWeaponArcball2
+global function ChargeBall_Init
+global function OnWeaponPrimaryAttack_weapon_titanweapon_charge_ball
+global function OnWeaponChargeBegin_titanweapon_charge_ball
+global function OnWeaponChargeEnd_titanweapon_charge_ball
 
 const ARCBALL2_CHARGE_FX_1P = $"wpn_arc_cannon_charge_fp"
 const ARCBALL2_CHARGE_FX_3P = $"wpn_arc_cannon_charge"
 
-void function MpTitanweaponArcBall2_Init()
+void function ChargeBall_Init()
 {
 	PrecacheParticleSystem( $"Weapon_ArcLauncher_Fire_1P" )
 	PrecacheParticleSystem( $"Weapon_ArcLauncher_Fire_3P" )
@@ -24,7 +24,7 @@ void function MpTitanweaponArcBall2_Init()
 	#endif
 }
 
-var function OnWeaponPrimaryAttack_weapon_MpTitanWeaponArcball2( entity weapon, WeaponPrimaryAttackParams attackParams )
+var function OnWeaponPrimaryAttack_weapon_titanweapon_charge_ball( entity weapon, WeaponPrimaryAttackParams attackParams )
 {
 	entity weaponOwner = weapon.GetWeaponOwner()
 
@@ -63,44 +63,30 @@ var function OnWeaponPrimaryAttack_weapon_MpTitanWeaponArcball2( entity weapon, 
 
 	float charge = weapon.GetWeaponChargeFraction()
 	float angleoffset = 0.05
+	float angleMultiplier = 1.6
+	int extraBallAmount = 0
 
 	vector rightVec = AnglesToRight(VectorToAngles(attackDir))
 
-  if (charge == 1.0)
+	if (charge == 1.0)
 	{
-		if ( weapon.HasMod( "thylord_module" ) )
-		{
-			FireArcBall( weapon, attackPos, attackDir, shouldPredict, 85 )
-			FireArcBall( weapon, attackPos, attackDir + rightVec * angleoffset*1.6, shouldPredict, 85 )
-			FireArcBall( weapon, attackPos, attackDir + rightVec * -angleoffset*1.6, shouldPredict, 85 )
-			FireArcBall( weapon, attackPos, attackDir + rightVec * angleoffset*3.2, shouldPredict, 85 )
-			FireArcBall( weapon, attackPos, attackDir + rightVec * -angleoffset*3.2, shouldPredict, 85 )
-			weapon.EmitWeaponSound_1p3p( "Weapon_ArcLauncher_Fire_1P", "Weapon_ArcLauncher_Fire_3P" )
-			weapon.EmitWeaponNpcSound( LOUD_WEAPON_AI_SOUND_RADIUS_MP, 0.2 )
-			//weapon.StopWeaponEffect( ARCBALL2_CHARGE_FX_1P, ARCBALL2_CHARGE_FX_3P )
-		}
-		else
-		{
-			FireArcBall( weapon, attackPos, attackDir, shouldPredict, 125 )
-			FireArcBall( weapon, attackPos, attackDir + rightVec * angleoffset*1.6, shouldPredict, 125 )
-			FireArcBall( weapon, attackPos, attackDir + rightVec * -angleoffset*1.6, shouldPredict, 125 )
-			weapon.EmitWeaponSound_1p3p( "Weapon_ArcLauncher_Fire_1P", "Weapon_ArcLauncher_Fire_3P" )
-			weapon.EmitWeaponNpcSound( LOUD_WEAPON_AI_SOUND_RADIUS_MP, 0.2 )
-			//weapon.StopWeaponEffect( ARCBALL2_CHARGE_FX_1P, ARCBALL2_CHARGE_FX_3P )
-		}
+  	extraBallAmount++
+  	if (weapon.HasMod("thylord_module") ) { extraBallAmount++ }
 	}
 
-	if (charge != 1.0)
+	for (int i = -extraBallAmount ; i < extraBallAmount+1 ; i++)
 	{
-		FireArcBall( weapon, attackPos, attackDir, shouldPredict, 250 )
-		weapon.EmitWeaponSound_1p3p( "Weapon_ArcLauncher_Fire_1P", "Weapon_ArcLauncher_Fire_3P" )
-		weapon.EmitWeaponNpcSound( LOUD_WEAPON_AI_SOUND_RADIUS_MP, 0.2 )
-		//weapon.StopWeaponEffect( ARCBALL2_CHARGE_FX_1P, ARCBALL2_CHARGE_FX_3P )
+		float finalMultiplier = angleMultiplier*i
+		int damageSplitter = extraBallAmount+1
+		float zapDamage = 300.0 / damageSplitter
+		FireArcBall( weapon, attackPos, attackDir + rightVec * angleoffset*finalMultiplier, shouldPredict, zapDamage ) //Need to define these in KV, 5 balls is 85 DMG, 3 is 125, 1 is 250
 	}
-	return 1
+	weapon.EmitWeaponSound_1p3p( "Weapon_ArcLauncher_Fire_1P", "Weapon_ArcLauncher_Fire_3P" )
+	weapon.EmitWeaponNpcSound( LOUD_WEAPON_AI_SOUND_RADIUS_MP, 0.2 )
+	return weapon.GetWeaponSettingInt( eWeaponVar.ammo_per_shot )
 }
 
-bool function OnWeaponChargeBegin_MpTitanWeaponArcball2( entity weapon )
+bool function OnWeaponChargeBegin_titanweapon_charge_ball( entity weapon )
 {
 	local stub = "this is here to suppress the untyped message.  This can go away when the .s. usage is removed from this file."
 	weapon.EmitWeaponSound("Weapon_EnergySyphon_Charge_3P")
@@ -117,7 +103,7 @@ bool function OnWeaponChargeBegin_MpTitanWeaponArcball2( entity weapon )
 	return true
 }
 
-void function OnWeaponChargeEnd_MpTitanWeaponArcball2( entity weapon )
+void function OnWeaponChargeEnd_titanweapon_charge_ball( entity weapon )
 {
 	weapon.StopWeaponSound("Weapon_EnergySyphon_Charge_3P")
 	#if CLIENT

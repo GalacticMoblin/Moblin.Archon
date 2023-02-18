@@ -11,17 +11,13 @@ WeaponData
 
 	"weaponClass" 									"titan"
 	"weaponType"									"tactical"
-	//"npc_use_check_type"							"while_evasive"
-	"npc_use_check_type"							"shared_energy"
-	"npc_target_armor_type"							"heavy"
 	"fire_mode"   									"offhand_instant"
 	"minimap_reveal_distance"						"32000"
 
-	"OnWeaponOwnerChanged"							"OnWeaponOwnerChanged_titanweapon_Arc_pylon"
-	"OnWeaponPrimaryAttack"							"OnWeaponPrimaryAttack_titanweapon_Arc_pylon"
-	"OnWeaponNPCPrimaryAttack"						"OnWeaponNPCPrimaryAttack_titanweapon_Arc_pylon"
+	"OnWeaponOwnerChanged"							"OnWeaponOwnerChanged_titanweapon_tesla_node"
+	"OnWeaponPrimaryAttack"							"OnWeaponPrimaryAttack_titanweapon_tesla_node"
+	"OnWeaponNPCPrimaryAttack"						"OnWeaponNPCPrimaryAttack_titanweapon_tesla_node"
 	"OnProjectileCollision"							"OnProjectileCollision_weapon_deployable"
-	"OnWeaponAttemptOffhandSwitch" 						"OnWeaponAttemptOffhandSwitch_titanweapon_Arc_pylon"
 
 	"projectile_ignores_vortex"						"fall_vortex"
 
@@ -92,15 +88,15 @@ WeaponData
 
 	// Ammo
 	"ammo_display"									"bar"
-	"ammo_stockpile_max"							"200"
-	"ammo_clip_size"   								"200"
-	"ammo_default_total"							"200"
-	"ammo_per_shot"									"200"
-	"ammo_min_to_fire"								"200"
+	"ammo_stockpile_max"							"300"
+	"ammo_clip_size"   								"300"
+	"ammo_default_total"							"300"
+	"ammo_per_shot"									"300"
+	"ammo_min_to_fire"								"300"
 	"cooldown_type"                                 "ammo_instant"
 
 	//Regen Ammo
-	"regen_ammo_refill_rate"						"15"
+	"regen_ammo_refill_rate"						"20" //15
 	"regen_ammo_refill_start_delay"					"0.0"
 
 	// Behavior
@@ -186,47 +182,11 @@ WeaponData
 
 	Mods
 	{
-		mod_spider
+		dev_primary_fire
 		{
-
-		}
-
-		dual_nodes
-		{
-			//what it sounds like
-			"ammo_stockpile_max"							"400"
-			"ammo_clip_size"   								"400"
-			"ammo_default_total"							"400"
-		}
-
-		clustermissile_fast_recharge
-		{
-			"fire_rate"   									"*2.2"
-		}
-
-		mod_ordnance_core
-		{
-			"fire_rate"   									"*1.25"
-		}
-
-		dev_mod_low_recharge
-		{
-			"fire_rate"   									"*20"
-		}
-		burn_mod_titan_dumbfire_rockets
-		{
-			"projectile_drift_windiness"					"*0.2"
-			"projectile_drift_intensity"					"*0.2"
-			"projectile_straight_time_min"					"*0.2"
-			"projectile_straight_time_max"					"*0.2"
-			"projectile_straight_radius_min"				"*0.2"
-			"projectile_straight_radius_max"				"*0.2"
-			"fire_rate"   									"*1.25"
-			"is_burn_mod"		"1"
-		}
-		pas_ion_tripwire
-		{
-			"shared_energy_cost"							"0"
+			"regen_ammo_refill_rate"						"3000"
+			"fire_rate"						"200"
+			"fire_mode"   									"full-auto"
 		}
 	}
 }

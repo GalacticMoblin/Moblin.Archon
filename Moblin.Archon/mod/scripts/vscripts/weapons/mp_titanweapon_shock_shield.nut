@@ -1,6 +1,6 @@
 untyped
 
-global function MpTitanweaponShockShield_Init
+global function ShockShield_Init
 
 global function OnWeaponActivate_titanweapon_shock_shield
 global function OnWeaponDeactivate_titanweapon_shock_shield
@@ -29,6 +29,9 @@ const SHOCK_HOLD_EFFECT = $"arcTrap_CH_arcs_large"
 const SHOCK_RELEASE_EFFECT_FP = $"P_wpn_muzzleflash_epg_FP"
 const SHOCK_RELEASE_EFFECT = $"P_wpn_muzzleflash_epg"
 
+const FX_EMP_FIELD						= $"P_xo_emp_field"
+const FX_EMP_FIELD_1P					= $"P_body_emp_1P"
+
 const VortexIgnoreClassnames = {
 	["mp_titancore_flame_wave"] = true,
 	["mp_ability_grapple"] = true,
@@ -37,27 +40,17 @@ const VortexIgnoreClassnames = {
 }
 
 
-function MpTitanweaponShockShield_Init()
+function ShockShield_Init()
 {
 	PrecacheWeapon( "mp_titanweapon_shock_shield" )
-	//PrecacheWeapon( "mp_titanweapon_shock_shield_archon" )
 	PrecacheParticleSystem( SHOCK_HOLD_EFFECT )
 	PrecacheParticleSystem( SHOCK_HOLD_EFFECT_FP )
 	PrecacheParticleSystem( SHOCK_RELEASE_EFFECT )
 	PrecacheParticleSystem( SHOCK_RELEASE_EFFECT_FP )
-	ShockShieldPrecache()
 	RegisterSignal( "DisableAmpedVortex" )
 	RegisterSignal( "FireAmpedVortexBullet" )
+	RegisterSignal( "OnShieldDestroy" )
 
-	#if SERVER
-		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_shock_shield, ShockShieldOnDamage )
-	#endif
-
-
-}
-
-function ShockShieldPrecache()
-{
 	PrecacheParticleSystem( $"wpn_vortex_chargingCP_titan_FP" )
 	PrecacheParticleSystem( $"wpn_vortex_chargingCP_titan_FP_replay" )
 	PrecacheParticleSystem( $"wpn_vortex_chargingCP_titan" )
@@ -76,10 +69,11 @@ function ShockShieldPrecache()
 	PrecacheParticleSystem( $"wpn_vortex_shield_impact_mod_bftb" )
 	PrecacheParticleSystem( $"wpn_muzzleflash_vortex_mod_CP_FP_bftb" )
 
-
 	PrecacheParticleSystem( $"P_impact_exp_emp_med_air" )
 
-
+	#if SERVER
+		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_shock_shield, ShockShieldOnDamage )
+	#endif
 }
 
 void function OnWeaponOwnerChanged_titanweapon_shock_shield( entity weapon, WeaponOwnerChangedParams changeParams )
@@ -278,9 +272,23 @@ bool function OnWeaponVortexHitBullet_titanweapon_shock_shield( entity weapon, e
 			string attackerWeaponName	= attackerWeapon.GetWeaponClassName()
 			int damageType				= DamageInfo_GetCustomDamageType( damageInfo )
 
+			/*if(weapon.HasMod("static_feedback") /*&& IsCriticalHit( attacker, ent, DamageInfo_GetHitBox( damageInfo ), DamageInfo_GetDamage( damageInfo ), DamageInfo_GetDamageType( damageInfo )))
+			{
+				//Shock Shield Recharge
+				if ( offhandWeaponSP.GetWeaponChargeFraction() - 0.05 * damageMultiplier < 0 )
+				{
+					//offhandWeaponSP.SetWeaponPrimaryClipCount( 100 )
+					offhandWeaponSP.SetWeaponChargeFraction(0)
+				}
+				else
+				{
+					//offhandWeaponSP.SetWeaponPrimaryClipCount( offhandWeaponSP.GetWeaponPrimaryClipCount() + 0.2)
+					offhandWeaponSP.SetWeaponChargeFraction(offhandWeaponSP.GetWeaponChargeFraction() - 0.05 * damageMultiplier)
+
+				}
+			}*/
+
 			return TryVortexAbsorb( vortexSphere, attacker, origin, damageSourceID, attackerWeapon, attackerWeaponName, "hitscan", null, damageType, false )
-
-
 
 		#endif
 }
@@ -326,11 +334,9 @@ var function OnWeaponPrimaryAttack_titanweapon_shock_shield( entity weapon, Weap
 #if SERVER
 var function OnWeaponNpcPrimaryAttack_titanweapon_shock_shield( entity weapon, WeaponPrimaryAttackParams attackParams )
 {
-	int bulletsFired = VortexPrimaryAttack( weapon, attackParams )
-
 	DestroyVortexSphereFromVortexWeapon( weapon )  // sphere ent holds networked ammo count, destroy it after predicted firing is done
 
-	return bulletsFired
+	return FireArchonCannon( weapon, attackParams )
 }
 #endif // #if SERVER
 
@@ -365,6 +371,10 @@ bool function OnWeaponChargeBegin_titanweapon_shock_shield( entity weapon )
 {
 	entity weaponOwner = weapon.GetWeaponOwner()
 
+	if(weapon.HasMod("fd_eye_of_the_storm")){
+		thread ActivateShockShieldArcField( weapon )
+	}
+
 	// just for players
 	if ( weaponOwner.IsPlayer() )
 	{
@@ -383,9 +393,12 @@ bool function OnWeaponChargeBegin_titanweapon_shock_shield( entity weapon )
 
 void function OnWeaponChargeEnd_titanweapon_shock_shield( entity weapon )
 {
+	entity owner = weapon.GetWeaponOwner()
+	owner.Signal( "OnShieldDestroy" )
+
 	float activationCost = ACTIVATION_COST_FRAC
 
-	if ( weapon.HasMod( "immobilizer_shield" ) )
+	if ( weapon.HasMod( "bolt_from_the_blue" ) )
 	{
 			activationCost = activationCost * 0.75
 	}
@@ -410,7 +423,7 @@ bool function OnWeaponAttemptOffhandSwitch_titanweapon_shock_shield( entity weap
 
 	float activationCost = ACTIVATION_COST_FRAC
 
-	if ( weapon.HasMod( "immobilizer_shield" ) )
+	if ( weapon.HasMod( "bolt_from_the_blue" ) )
 	{
 			activationCost = activationCost * 0.75
 	}
@@ -445,6 +458,9 @@ void function ShockShieldOnDamage( entity ent, var damageInfo )
 
 		if ( soul != null )
 			entToSlow = soul
+
+		if ( DamageInfo_GetDamage( damageInfo ) <= 0 )
+			return
 
 		const ARC_TITAN_EMP_DURATION			= 0.35
 		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
@@ -483,4 +499,121 @@ void function ShockShieldOnDamage( entity ent, var damageInfo )
 
 
 	}
+}
+
+void function ActivateShockShieldArcField( entity weapon )
+{
+	#if SERVER
+	if ( IsValid( weapon ) )
+	{
+		entity owner = weapon.GetWeaponOwner()
+
+		local attachment = GetEMPAttachmentForTitan( owner )
+
+		local attachID = owner.LookupAttachment( attachment )
+
+		EmitSoundOnEntity( owner, "EMP_Titan_Electrical_Field" )
+
+		array<entity> particles = []
+
+		//emp field fx
+		vector origin = owner.GetAttachmentOrigin( attachID )
+		if ( owner.IsPlayer() )
+		{
+			entity particleSystem = CreateEntity( "info_particle_system" )
+			particleSystem.kv.start_active = 1
+			particleSystem.kv.VisibilityFlags = ENTITY_VISIBLE_TO_OWNER
+			particleSystem.SetValueForEffectNameKey( FX_EMP_FIELD_1P )
+
+			particleSystem.SetOrigin( origin )
+			particleSystem.SetOwner( owner )
+			DispatchSpawn( particleSystem )
+			particleSystem.SetParent( owner, GetEMPAttachmentForTitan( owner ) )
+			particles.append( particleSystem )
+		}
+
+		entity particleSystem = CreateEntity( "info_particle_system" )
+		particleSystem.kv.start_active = 1
+		if ( owner.IsPlayer() )
+			particleSystem.kv.VisibilityFlags = (ENTITY_VISIBLE_TO_FRIENDLY | ENTITY_VISIBLE_TO_ENEMY)	// everyone but owner
+		else
+			particleSystem.kv.VisibilityFlags = ENTITY_VISIBLE_TO_EVERYONE
+		particleSystem.SetValueForEffectNameKey( FX_EMP_FIELD )
+		particleSystem.SetOwner( owner )
+		particleSystem.SetOrigin( origin )
+		DispatchSpawn( particleSystem )
+		particleSystem.SetParent( owner, GetEMPAttachmentForTitan( owner ) )
+		particles.append( particleSystem )
+
+		//PlayFXOnEntity( FX_EMP_FIELD, owner, "", <0, 0, 0> )
+
+		//vector origin = owner.OffsetPositionFromView( <0, 0, 0>, <25, -25, 15> )
+
+		thread UpdateShockShieldField( weapon )
+
+		owner.WaitSignal( "OnShieldDestroy" )
+		owner.EndSignal( "OnShieldDestroy" )
+
+		OnThreadEnd(
+			function () : ( owner, particles )
+			{
+				if ( IsValid( owner ) )
+				{
+					StopSoundOnEntity( owner, "EMP_Titan_Electrical_Field" )
+				}
+
+				foreach ( particleSystem in particles )
+				{
+					if ( IsValid_ThisFrame( particleSystem ) )
+					{
+						particleSystem.ClearParent()
+						particleSystem.Fire( "StopPlayEndCap" )
+						particleSystem.Kill_Deprecated_UseDestroyInstead( 1.0 )
+					}
+				}
+			}
+		)
+	}
+	#endif
+}
+
+#if SERVER
+void function UpdateShockShieldField( entity weapon )
+{
+	entity owner = weapon.GetWeaponOwner()
+
+  owner.EndSignal( "OnShieldDestroy" )
+
+	while ( true )
+	{
+		WaitFrame()
+		vector origin = owner.GetOrigin()
+		ShockShieldFieldDamage( weapon, origin )
+	}
+
+}
+
+function ShockShieldFieldDamage( entity weapon, vector origin )
+{
+	int flags = DF_STOPS_TITAN_REGEN | DF_SKIP_DAMAGE_PROT
+
+	RadiusDamage(
+		origin,									// center
+		weapon.GetWeaponOwner(),									// attacker
+		weapon,									// inflictor
+		30,					// damage
+		100,					// damageHeavyArmor
+		ARC_TITAN_EMP_FIELD_INNER_RADIUS,		// innerRadius
+		ARC_TITAN_EMP_FIELD_RADIUS,				// outerRadius
+		SF_ENVEXPLOSION_NO_DAMAGEOWNER,			// flags
+		0,										// distanceFromAttacker
+		0,					                    // explosionForce
+		flags,	// scriptDamageFlags
+		eDamageSourceId.mp_titanweapon_shock_shield )			// scriptDamageSourceIdentifier
+}
+#endif
+
+string function GetEMPAttachmentForTitan( entity titan )
+{
+	return  "hijack"
 }
