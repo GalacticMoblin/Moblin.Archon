@@ -4,10 +4,10 @@
 
 **REQUIRED BY SERVER AND CLIENT**
 
-Implements the Archon Titan based off of cut content. (Special Thanks to 2009 Memes and Dinorush)
+Implements the Archon Titan based off of cut content.
 
 ### Activation
-Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArchon()``` to give the loadout to the first player. Player index can be specified if desired, e.g. Give Archon to player 3: ```script GiveArchon(2)```.
+Select your titan within the additional 3 titan slots provided by `Peepee.TitanFramework` and bring down your titan.
 
 ## Loadout
 
@@ -18,7 +18,6 @@ Requires enabling ```sv_cheats 1```. Be Ion/Ion Prime and run ```script GiveArch
 *Offensive:* Charge Ball
 
 - Fires a powerful electric ball, fully charge to fire three slightly weaker shots at once.
-
 
 *Defensive:* Shock Shield
 
