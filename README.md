@@ -1,6 +1,6 @@
 # Archon
 
-<img src="https://user-images.githubusercontent.com/100473309/219979264-e7f97521-695a-4cd8-b884-544d1564ed76.png" width="250" height="250">
+<img src="https://user-images.githubusercontent.com/100473309/219979264-e7f97521-695a-4cd8-b884-544d1564ed76.png" width="200" height="200">
 
 **REQUIRED BY SERVER AND CLIENT**
 
