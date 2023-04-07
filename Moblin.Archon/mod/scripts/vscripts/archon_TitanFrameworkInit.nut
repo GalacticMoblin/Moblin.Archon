@@ -2,12 +2,15 @@ global function ArchonUIInit
 void function ArchonUIInit()
 {
 	#if ARCHON_HAS_TITANFRAMEWORK
+	//========================================//-NAMES AND STATS-//========================================//
 		ModdedTitanData Archon
 		Archon.Name = "#DEFAULT_TITAN_1"
+		Archon.icon = $"archon/menu/archon_icon_medium"
 		Archon.Description = "#MP_TITAN_LOADOUT_DESC_ARCHON"
 		Archon.BaseSetFile = "titan_atlas_stickybomb"
 		Archon.BaseName = "ion"
-		Archon.passiveDisplayNameOverride = "#TITAN_ARCHON_PASSIVE_TITLE"
+		Archon.startsAsPrime = true
+		Archon.passiveDisplayNameOverride = "#TITAN_OS_ARCHON_NAME"
 		Archon.difficulty = 2
 		Archon.speedStat = 2
 		Archon.damageStat = 3
@@ -20,8 +23,9 @@ void function ArchonUIInit()
 		"#DEATH_HINT_ARCHON_006",
 		"#DEATH_HINT_ARCHON_007" ]
 
+		//========================================//-WEAPONS-//========================================//
 		ModdedTitanWeaponAbilityData ArcCannon
-		ArcCannon.custom = true //when this is false titanframework will not create items, useful if you want to use default items
+		ArcCannon.custom = true
 		ArcCannon.displayName = "#WPN_TITAN_ARC_CANNON"
 		ArcCannon.weaponName = "mp_titanweapon_arc_cannon"
 		ArcCannon.description = "#WPN_TITAN_ARC_CANNON_LONGDESC"
@@ -41,7 +45,7 @@ void function ArchonUIInit()
 		StormCore.weaponName = "mp_titancore_storm_core"
 		StormCore.displayName = "#TITANCORE_STORM"
 		StormCore.description = "#TITANCORE_STORM_DESC"
-		StormCore.image = $"archon/menu/storm_core"
+		StormCore.image = $"archon/hud/storm_core"
 		Archon.Core = StormCore
 
 		ModdedTitanWeaponAbilityData ShockShield
@@ -54,27 +58,19 @@ void function ArchonUIInit()
 
 		ModdedTitanWeaponAbilityData TeslaNode
 		TeslaNode.custom = true
-		TeslaNode.displayName = "#WPN_TITAN_ARC_PYLON"
+		TeslaNode.displayName = "#WPN_TITAN_TESLA_NODE"
 		TeslaNode.weaponName = "mp_titanweapon_tesla_node"
-		TeslaNode.description = "#WPN_TITAN_ARC_PYLON_DESC"
-		TeslaNode.image = $"archon/menu/arc_pylon"
+		TeslaNode.description = "#WPN_TITAN_TESLA_NODE_DESC"
+		TeslaNode.image = $"archon/menu/tesla_node"
 		Archon.Mid = TeslaNode
 
-
-
-		/*
-		======IMPORTANT======
-		titanFramework uses persitence masking to map real passives in persistent data to the "fake" ones created here
-		this means the number of custom passives in a slot cannot exceed the number of default passives that exist
-		I err, dont know what will happen if you do this. Probably an index error
-		*/
-		ModdedPassiveData ChainReaction //Define a new passive to equip the predator cannon
+		//========================================//-KITS-//========================================//
+		ModdedPassiveData ChainReaction
 		ChainReaction.Name = "#GEAR_ARCHON_CHAIN"
 		ChainReaction.description = "#GEAR_ARCHON_CHAIN_DESC"
 		ChainReaction.image = $"archon/menu/chain_reaction"
 		ChainReaction.customIcon = true
-		Archon.passive2Array.append(ChainReaction) //If nothing is registered in passive2 it will
-		//display the defaults passivesfor the base titan(vanguard in this case))
+		Archon.passive2Array.append(ChainReaction)
 
 		ModdedPassiveData boltfromtheblue
 		boltfromtheblue.Name = "#GEAR_ARCHON_SHIELD"
@@ -83,14 +79,12 @@ void function ArchonUIInit()
 		boltfromtheblue.customIcon = true
 		Archon.passive2Array.append(boltfromtheblue)
 
-
 		ModdedPassiveData thylord
 		thylord.Name = "#GEAR_ARCHON_THYLORD"
 		thylord.description = "#GEAR_ARCHON_THYLORD_DESC"
 		thylord.image =  $"archon/menu/thylord_module"
 		thylord.customIcon = true
 		Archon.passive2Array.append(thylord)
-
 
 		ModdedPassiveData StaticFeedback
 		StaticFeedback.Name = "#GEAR_ARCHON_FEEDBACK"
@@ -106,7 +100,56 @@ void function ArchonUIInit()
 		BringTheThunder.customIcon = true
 		Archon.passive2Array.append(BringTheThunder)
 
+		//========================================//-AEGIS RANKS-//========================================//
+		ModdedPassiveData CriticalOverload
+		CriticalOverload.Name = "#FD_UPGRADE_ARCHON_WEAPON_TIER_1"
+		CriticalOverload.description = "#FD_UPGRADE_ARCHON_WEAPON_TIER_1_DESC"
+		CriticalOverload.image = $"archon/hud/fd_critical_overload"
+		CriticalOverload.customIcon = true
+		Archon.passiveFDArray.append(CriticalOverload)
 
-		CreateModdedTitanSimple(Archon)//Ah yes """"""""""""Simple""""""""""""
+		ModdedPassiveData ChassisUpgrade
+		ChassisUpgrade.Name = "#FD_UPGRADE_ARCHON_DEFENSE_TIER_1"
+		ChassisUpgrade.description = "#FD_UPGRADE_ARCHON_DEFENSE_TIER_1_DESC"
+		ChassisUpgrade.image = $"archon/hud/fd_archon_health_upgrade"
+		ChassisUpgrade.customIcon = true
+		Archon.passiveFDArray.append(ChassisUpgrade)
+
+		ModdedPassiveData eyeOfTheStorm
+		eyeOfTheStorm.Name = "#FD_UPGRADE_ARCHON_UTILITY_TIER_2"
+		eyeOfTheStorm.description = "#FD_UPGRADE_ARCHON_UTILITY_TIER_2_DESC"
+		eyeOfTheStorm.image = $"archon/hud/fd_eye_of_the_storm"
+		eyeOfTheStorm.customIcon = true
+		Archon.passiveFDArray.append(eyeOfTheStorm)
+
+		ModdedPassiveData Terminator
+		Terminator.Name = "#FD_UPGRADE_ARCHON_WEAPON_TIER_2"
+		Terminator.description = "#FD_UPGRADE_ARCHON_WEAPON_TIER_2_DESC"
+		Terminator.image = $"archon/hud/fd_terminator"
+		Terminator.customIcon = true
+		Archon.passiveFDArray.append(Terminator)
+
+		ModdedPassiveData ShieldUpgrade
+		ShieldUpgrade.Name = "#FD_UPGRADE_ARCHON_DEFENSE_TIER_2"
+		ShieldUpgrade.description = "#FD_UPGRADE_ARCHON_DEFENSE_TIER_2_DESC"
+		ShieldUpgrade.image = $"archon/hud/fd_archon_shield_upgrade"
+		ShieldUpgrade.customIcon = true
+		Archon.passiveFDArray.append(ShieldUpgrade)
+
+		ModdedPassiveData ExtraCapacitor
+		ExtraCapacitor.Name = "#FD_UPGRADE_ARCHON_UTILITY_TIER_1"
+		ExtraCapacitor.description = "#FD_UPGRADE_ARCHON_UTILITY_TIER_1_DESC"
+		ExtraCapacitor.image = $"archon/hud/fd_extra_capacitor"
+		ExtraCapacitor.customIcon = true
+		Archon.passiveFDArray.append(ExtraCapacitor)
+
+		ModdedPassiveData RollingThunder
+		RollingThunder.Name = "#FD_UPGRADE_ARCHON_ULTIMATE"
+		RollingThunder.description = "#FD_UPGRADE_ARCHON_ULTIMATE_DESC"
+		RollingThunder.image = $"archon/hud/fd_rolling_thunder"
+		RollingThunder.customIcon = true
+		Archon.passiveFDArray.append(RollingThunder)
+
+		CreateModdedTitanSimple(Archon)
 	#endif
 }

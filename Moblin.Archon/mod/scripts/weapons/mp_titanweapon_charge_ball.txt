@@ -101,16 +101,16 @@ WeaponData
 
 	// Ammo
 	"cooldown_type"                                 "ammo_instant"
-	"ammo_clip_size"   								"240"
-	"ammo_default_total"							"240"
-	"ammo_min_to_fire"								"240"
-	"ammo_per_shot"									"240"
-	"ammo_stockpile_max"							"240"
+	"ammo_clip_size"   								"480"
+	"ammo_default_total"							"480"
+	"ammo_min_to_fire"								"480"
+	"ammo_per_shot"									"480"
+	"ammo_stockpile_max"							"480"
 	"ammo_drains_to_empty_on_fire"					"0"
 	"ammo_no_remove_from_clip"						"0"
 
 	//Regen Ammo
-	"regen_ammo_refill_rate"						"30"
+	"regen_ammo_refill_rate"						"60"
 	"regen_ammo_refill_start_delay"					"0"
 
 	// Damage - When Used by Players
@@ -227,7 +227,6 @@ WeaponData
 	"npc_charge_time_min"							"1.0"	// for rocketpod animation time
 	"npc_charge_time_max"							"1.0"
 
-
 	active_crosshair_count				"1"
 	rui_crosshair_index					"0"
 
@@ -244,17 +243,27 @@ WeaponData
 		{
 			// Ammo
 			"ammo_display"									"bar"
-			"ammo_stockpile_max"							"480"
-			"ammo_clip_size"   								"480"
-			"ammo_default_total"							"480"
-			"ammo_per_shot"									"240"
-			"ammo_min_to_fire"								"240"
+			"ammo_stockpile_max"							"960"
+			"ammo_clip_size"   								"960"
+			"ammo_default_total"							"960"
+			"ammo_per_shot"									"480"
+			"ammo_min_to_fire"								"480"
 
-			"hud_icon"										"archon/hud/fd_charge_ball"
+			"hud_icon"										"archon/hud/fd_extra_capacitor"
+		}
+		fd_terminator
+		{
+			//Used for Aegis modes only
 		}
 		burn_mod_charge_ball
 		{
-			//used to keep Terminator's countdown on screen
+			"is_burn_mod"									"1"
+			"charge_time" 									"*0.67" //33% Charge Time Bonus
+		}
+		fd_balance
+		{
+			"damage_near_value_titanarmor"					"*0.9"
+			"damage_far_value_titanarmor" 					"*0.9"
 		}
 	}
 

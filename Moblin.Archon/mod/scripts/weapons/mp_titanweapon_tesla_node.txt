@@ -1,13 +1,13 @@
 WeaponData
 {
 	// General
-	"printname"   									"#WPN_TITAN_ARC_PYLON"
-	"shortprintname"                              							"#WPN_TITAN_ARC_PYLON_SHORT"
-	"description" 									"#WPN_TITAN_ARC_PYLON_DESC"
-	"longdesc"									"#WPN_TITAN_ARC_PYLON_LONGDESC"
+	"printname"   									"#WPN_TITAN_TESLA_NODE"
+	"shortprintname"                              							"#WPN_TITAN_TESLA_NODE_SHORT"
+	"description" 									"#WPN_TITAN_TESLA_NODE_DESC"
+	"longdesc"									"#WPN_TITAN_TESLA_NODE_LONGDESC"
 
-	"menu_icon"										"archon/menu/arc_pylon"
-	"hud_icon"										"archon/hud/arc_pylon"
+	"menu_icon"										"archon/menu/tesla_node"
+	"hud_icon"										"archon/hud/tesla_node"
 
 	"weaponClass" 									"titan"
 	"weaponType"									"tactical"
@@ -88,15 +88,15 @@ WeaponData
 
 	// Ammo
 	"ammo_display"									"bar"
-	"ammo_stockpile_max"							"300"
-	"ammo_clip_size"   								"300"
-	"ammo_default_total"							"300"
-	"ammo_per_shot"									"300"
-	"ammo_min_to_fire"								"300"
+	"ammo_stockpile_max"							"450"
+	"ammo_clip_size"   								"450"
+	"ammo_default_total"							"450"
+	"ammo_per_shot"									"450"
+	"ammo_min_to_fire"								"450"
 	"cooldown_type"                                 "ammo_instant"
 
 	//Regen Ammo
-	"regen_ammo_refill_rate"						"20" //15
+	"regen_ammo_refill_rate"						"30" // 15s
 	"regen_ammo_refill_start_delay"					"0.0"
 
 	// Behavior
@@ -187,6 +187,10 @@ WeaponData
 			"regen_ammo_refill_rate"						"3000"
 			"fire_rate"						"200"
 			"fire_mode"   									"full-auto"
+		}
+		fd_terminator
+		{
+			//Used for Aegis modes only
 		}
 	}
 }

@@ -2,19 +2,28 @@ untyped
 
 //global function GiveArchon
 global function ArchonPrecache
+global function ArchonNetworkVars
+global function UpdateArchonTerminatorMeter
 
 #if SERVER
 global function DamageShieldsInRadiusOnEntity
+global function ConeDamageTethersException
 #endif
 
-const float TERMINATOR_EFFECT_LENGTH = 15.0
+const float TERMINATOR_EFFECT_LENGTH = 20.0
+const int FD_TERMINATOR_DAMAGE_MAX = 10000
+
+struct
+{
+	var archonTerminatorRui
+} file
 
 void function ArchonPrecache()
 {
 	#if SERVER
 	RegisterWeaponDamageSources(
 		{
-			mp_titanweapon_tesla_node = "#WPN_TITAN_ARC_PYLON",
+			mp_titanweapon_tesla_node = "#WPN_TITAN_TESLA_NODE",
 			mp_titanweapon_charge_ball = "#WPN_TITAN_CHARGE_BALL",
 			mp_titanweapon_shock_shield = "#WPN_TITAN_SHOCK_SHIELD",
 			mp_titancore_storm_core = "#TITANCORE_STORM"
@@ -30,9 +39,15 @@ void function ArchonPrecache()
 	Archon_Loadout_Util()
 	#if SERVER
         GameModeRulesRegisterTimerCreditException( eDamageSourceId.mp_titancore_storm_core )
-				AddDeathCallback( "npc_titan", OnTitanTerminated )
-				AddDeathCallback( "player", OnTitanTerminated )
 	#endif
+	#if CLIENT
+		AddTitanCockpitManagedRUI( Archon_CreateTerminatorBar, Archon_DestroyTerminatorBar, Archon_ShouldCreateTerminatorBar, RUI_DRAW_COCKPIT ) //RUI_DRAW_HUD
+	#endif
+}
+
+void function ArchonNetworkVars()
+{
+	AddCallback_OnRegisteringCustomNetworkVars( RegisterArchonNetworkVars )
 }
 
 #if SERVER
@@ -121,29 +136,6 @@ array<entity> function DamageShieldsInRadiusOnEntity( entity weapon, entity infl
 }
 #endif
 
-#if SERVER
-void function OnTitanTerminated( entity ent, var damageInfo )
-{
-	vector pos = DamageInfo_GetDamagePosition( damageInfo )
-	entity attacker = DamageInfo_GetAttacker( damageInfo )
-
-	if(DamageInfo_GetDamageSourceIdentifier( damageInfo ) == eDamageSourceId.titan_execution)
-	{
-		if ( IsValid( attacker ) )
-		{
-			if(!attacker.IsTitan())
-				return
-			entity weapon = attacker.GetActiveWeapon()
-			if (weapon.HasMod( "fd_terminator" ))
-			{
-				attacker.Signal("StopTerminator")
-				thread PlayerGotTerminator( attacker )
-			}
-		}
-	}
-}
-#endif
-
 void function PlayerGotTerminator( entity player )
 {
 	player.EndSignal("StopTerminator")
@@ -185,7 +177,79 @@ void function PlayerGotTerminator( entity player )
 
 		foreach ( string mod in GetWeaponBurnMods( weapon.GetWeaponClassName() ) )
 			weapon.RemoveMod( mod )
+			player.SetPlayerNetFloat( "terminatorMeter", 0.0)
 
 		weapon.SetScriptFlags0( weapon.GetScriptFlags0() & ~WEAPONFLAG_AMPED )
 	}
 }
+
+void function RegisterArchonNetworkVars()
+{
+	if (!IsLobby())
+	{
+		RegisterNetworkedVariable( "terminatorMeter", SNDC_PLAYER_GLOBAL, SNVT_FLOAT_RANGE_OVER_TIME, 0.0, 0.0, 1.0 )
+	}
+}
+
+#if CLIENT
+var function Archon_CreateTerminatorBar()
+{
+	Assert( file.archonTerminatorRui == null )
+
+	file.archonTerminatorRui = CreateFixedTitanCockpitRui( $"ui/scorch_hotstreak_bar.rpak" )
+
+	RuiTrackFloat( file.archonTerminatorRui, "coreMeterMultiplier", GetLocalViewPlayer(), RUI_TRACK_SCRIPT_NETWORK_VAR, GetNetworkedVariableIndex( "terminatorMeter" ) )
+
+	return file.archonTerminatorRui
+}
+
+void function Archon_DestroyTerminatorBar()
+{
+	TitanCockpitDestroyRui( file.archonTerminatorRui )
+	file.archonTerminatorRui = null
+}
+
+bool function Archon_ShouldCreateTerminatorBar()
+{
+	entity player = GetLocalViewPlayer()
+
+	if ( !IsAlive( player ) )
+		return false
+
+	array<entity> mainWeapons = player.GetMainWeapons()
+	if ( mainWeapons.len() == 0 )
+		return false
+
+	entity primaryWeapon = mainWeapons[0]
+	return primaryWeapon.HasMod( "fd_terminator" )
+}
+#endif
+
+void function UpdateArchonTerminatorMeter( entity attacker, float damage )
+{
+	if ( !attacker.IsPlayer() )
+		return
+
+	if(!attacker.GetMainWeapons()[0].HasMod("burn_mod_fd_terminator_active")){
+		float baseValue = attacker.GetPlayerNetFloat( "terminatorMeter" )
+		float newValue = damage / FD_TERMINATOR_DAMAGE_MAX * 0.5
+		float combinedValue = baseValue + newValue
+		if ( baseValue + newValue >= 0.5 )
+			combinedValue = 1.0
+
+		attacker.SetPlayerNetFloat( "terminatorMeter", combinedValue )
+	}
+
+	if(attacker.GetPlayerNetFloat( "terminatorMeter" ) >= 1.0 && !attacker.GetMainWeapons()[0].HasMod("burn_mod_fd_terminator_active"))
+		thread PlayerGotTerminator( attacker )
+}
+
+#if SERVER
+void function ConeDamageTethersException( entity ent, var damageInfo )
+{
+	int attackerDamageSourceID = DamageInfo_GetDamageSourceIdentifier( damageInfo )
+
+	if ( attackerDamageSourceID == eDamageSourceId.mp_weapon_shotgun )
+		DamageInfo_SetDamage( damageInfo, 0 )
+}
+#endif

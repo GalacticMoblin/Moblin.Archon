@@ -3,9 +3,21 @@
     "Description": "Implements the Archon Titan based off of cut content.\n\n[IMPORTANT]\nDepends on [Peepee.TitanFramework] to work.\n\nThank you to everyone who has contributed and playtested the mod.",
     "LoadPriority": 1,
     "RequiredOnClient": true,
-    "Version": "1.5.0",
+    "Version": "1.5.2",
 
     "Scripts": [
+        {
+            "Path": "sh_archon_util.nut",
+            "RunOn": "( CLIENT || SERVER ) && MP",
+            "ClientCallback": {
+                "Before": "ArchonNetworkVars",
+                "After": "ArchonPrecache"
+            },
+            "ServerCallback": {
+                "Before": "ArchonNetworkVars",
+                "After": "ArchonPrecache"
+            }
+        },
         {
             "Path": "archon_TitanFrameworkInit.nut",
             "RunOn": "CLIENT || UI || SERVER",
@@ -47,16 +59,6 @@
         {
             "Path": "weapons/mp_titanweapon_arc_cannon.nut",
             "RunOn": "( CLIENT || SERVER ) && MP",
-        },
-        {
-            "Path": "sh_archon_util.nut",
-            "RunOn": "( CLIENT || SERVER ) && MP",
-            "ClientCallback": {
-                "After": "ArchonPrecache"
-            },
-            "ServerCallback": {
-                "After": "ArchonPrecache"
-            }
         },
         {
           "Path": "archon_loadout_util.nut",

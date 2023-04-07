@@ -281,7 +281,7 @@ function DeployArcPylon( entity projectile )
   if( !IsValid( pylon ) )
       return
 
-  AI_CreateDangerousArea_Static( pylon, projectile, ARC_TITAN_EMP_FIELD_RADIUS + 50, TEAM_INVALID, true, true, pylonOrigin )
+  //AI_CreateDangerousArea_Static( pylon, projectile, ARC_TITAN_EMP_FIELD_RADIUS + 50, TEAM_INVALID, true, true, pylonOrigin )
 
   string attachment = ""
 	int attachID = pylon.LookupAttachment( attachment )
@@ -370,6 +370,14 @@ void function ArcPylon_DamagedPlayerOrNPC( entity ent, var damageInfo )
 	float screenEffectAmplitude = GraphCapped( distSqr, ARC_TITAN_EMP_FIELD_INNER_RADIUS, ARC_TITAN_EMP_FIELD_RADIUS, empFxHigh, empFxLow )
 
 	StatusEffect_AddTimed( ent, eStatusEffect.emp, screenEffectAmplitude, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+
+	entity attacker = DamageInfo_GetAttacker( damageInfo )
+	entity mainWeapon = attacker.GetOffhandWeapon( OFFHAND_SPECIAL )
+
+	if(IsValid(mainWeapon)){
+		if ( mainWeapon.HasMod( "fd_terminator" ) )
+			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
+	}
 }
 #endif
 

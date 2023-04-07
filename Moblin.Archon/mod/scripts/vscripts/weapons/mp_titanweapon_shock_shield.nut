@@ -28,6 +28,7 @@ const SHOCK_HOLD_EFFECT_FP = $"arcTrap_CH_arcs_large"
 const SHOCK_HOLD_EFFECT = $"arcTrap_CH_arcs_large"
 const SHOCK_RELEASE_EFFECT_FP = $"P_wpn_muzzleflash_epg_FP"
 const SHOCK_RELEASE_EFFECT = $"P_wpn_muzzleflash_epg"
+const SHOCK_BULLET_HIT = $"P_elec_arc_loop_LG_1" //P_ArcSwitch_close
 
 const FX_EMP_FIELD						= $"P_xo_emp_field"
 const FX_EMP_FIELD_1P					= $"P_body_emp_1P"
@@ -47,6 +48,7 @@ function ShockShield_Init()
 	PrecacheParticleSystem( SHOCK_HOLD_EFFECT_FP )
 	PrecacheParticleSystem( SHOCK_RELEASE_EFFECT )
 	PrecacheParticleSystem( SHOCK_RELEASE_EFFECT_FP )
+	PrecacheParticleSystem( SHOCK_BULLET_HIT )
 	RegisterSignal( "DisableAmpedVortex" )
 	RegisterSignal( "FireAmpedVortexBullet" )
 	RegisterSignal( "OnShieldDestroy" )
@@ -85,12 +87,12 @@ void function OnWeaponOwnerChanged_titanweapon_shock_shield( entity weapon, Weap
 		weapon.s.fxChargingFPControlPoint <- $"wpn_vortex_chargingCP_mod_FP_arc"
 		weapon.s.fxChargingFPControlPointReplay <- $"wpn_vortex_chargingCP_mod_FP_replay_arc"
 		weapon.s.fxChargingControlPoint <- $"wpn_vortex_chargingCP_mod_arc"
-		weapon.s.fxBulletHit <- $"wpn_vortex_shield_impact_mod_arc"
+		weapon.s.fxBulletHit <- SHOCK_BULLET_HIT
 
 		weapon.s.fxChargingFPControlPointBurn <- $"wpn_vortex_chargingCP_mod_FP_bftb"
 		weapon.s.fxChargingFPControlPointReplayBurn <- $"wpn_vortex_chargingCP_mod_FP_replay_bftb"
 		weapon.s.fxChargingControlPointBurn <- $"wpn_vortex_chargingCP_mod_bftb"
-		weapon.s.fxBulletHitBurn <- $"wpn_vortex_shield_impact_mod_bftb"
+		weapon.s.fxBulletHitBurn <- SHOCK_BULLET_HIT
 
 		weapon.s.fxElectricalExplosion <- $"P_impact_exp_emp_med_air"
 
@@ -155,7 +157,7 @@ function StartVortex( entity weapon )
 
 	Vortex_SetBulletCollectionOffset( weapon, Vector( 110, -28, -22.0 ) )
 
-	int sphereRadius = 150
+	int sphereRadius = 350
 	int bulletFOV = 120
 
 	//ApplyActivationCost( weapon, ACTIVATION_COST_FRAC )
@@ -254,50 +256,30 @@ function EndVortex( entity weapon )
 
 bool function OnWeaponVortexHitBullet_titanweapon_shock_shield( entity weapon, entity vortexSphere, var damageInfo )
 {
-	if ( weapon.HasMod( "shield_only" ) )
+	#if CLIENT
+		return true
+	#else
+		if ( !ValidateVortexImpact( vortexSphere ) )
+			return false
+
+		entity attacker				= DamageInfo_GetAttacker( damageInfo )
+		vector origin				= DamageInfo_GetDamagePosition( damageInfo )
+		int damageSourceID			= DamageInfo_GetDamageSourceIdentifier( damageInfo )
+		entity attackerWeapon		= DamageInfo_GetWeapon( damageInfo )
+		string attackerWeaponName	= attackerWeapon.GetWeaponClassName()
+
+		local impactData = Vortex_CreateImpactEventData( weapon, attacker, origin, damageSourceID, attackerWeaponName, "hitscan" )
+		VortexDrainedByImpact( weapon, attackerWeapon, null, null )
+		if ( impactData.refireBehavior == VORTEX_REFIRE_ABSORB )
 			return true
+		Vortex_SpawnHeatShieldPingFX( weapon, impactData, true )
 
-		#if CLIENT
-			return true
-		#else
-			if ( !ValidateVortexImpact( vortexSphere ) )
-				return false
-
-			entity attacker				= DamageInfo_GetAttacker( damageInfo )
-			vector origin				= DamageInfo_GetDamagePosition( damageInfo )
-			int damageSourceID			= DamageInfo_GetDamageSourceIdentifier( damageInfo )
-			entity attackerWeapon		= DamageInfo_GetWeapon( damageInfo )
-			if ( PROTO_ATTurretsEnabled() && !IsValid( attackerWeapon ) )
-				return true
-			string attackerWeaponName	= attackerWeapon.GetWeaponClassName()
-			int damageType				= DamageInfo_GetCustomDamageType( damageInfo )
-
-			/*if(weapon.HasMod("static_feedback") /*&& IsCriticalHit( attacker, ent, DamageInfo_GetHitBox( damageInfo ), DamageInfo_GetDamage( damageInfo ), DamageInfo_GetDamageType( damageInfo )))
-			{
-				//Shock Shield Recharge
-				if ( offhandWeaponSP.GetWeaponChargeFraction() - 0.05 * damageMultiplier < 0 )
-				{
-					//offhandWeaponSP.SetWeaponPrimaryClipCount( 100 )
-					offhandWeaponSP.SetWeaponChargeFraction(0)
-				}
-				else
-				{
-					//offhandWeaponSP.SetWeaponPrimaryClipCount( offhandWeaponSP.GetWeaponPrimaryClipCount() + 0.2)
-					offhandWeaponSP.SetWeaponChargeFraction(offhandWeaponSP.GetWeaponChargeFraction() - 0.05 * damageMultiplier)
-
-				}
-			}*/
-
-			return TryVortexAbsorb( vortexSphere, attacker, origin, damageSourceID, attackerWeapon, attackerWeaponName, "hitscan", null, damageType, false )
-
-		#endif
+		return true
+	#endif
 }
 
 bool function OnWeaponVortexHitProjectile_titanweapon_shock_shield( entity weapon, entity vortexSphere, entity attacker, entity projectile, vector contactPos )
 {
-	if ( weapon.HasMod( "shield_only" ) )
-		return true
-
 	#if CLIENT
 		return true
 	#else
@@ -307,7 +289,12 @@ bool function OnWeaponVortexHitProjectile_titanweapon_shock_shield( entity weapo
 		int damageSourceID = projectile.ProjectileGetDamageSourceID()
 		string weaponName = projectile.ProjectileGetWeaponClassName()
 
-		return TryVortexAbsorb( vortexSphere, attacker, contactPos, damageSourceID, projectile, weaponName, "projectile", projectile, null, weapon.HasMod( "burn_mod_titan_vortex_shield" ) )
+		local impactData = Vortex_CreateImpactEventData( weapon, attacker, contactPos, damageSourceID, weaponName, "projectile" )
+		VortexDrainedByImpact( weapon, projectile, projectile, null )
+		if ( impactData.refireBehavior == VORTEX_REFIRE_ABSORB )
+			return true
+		Vortex_SpawnHeatShieldPingFX( weapon, impactData, false )
+		return true
 	#endif
 }
 
@@ -469,6 +456,13 @@ void function ShockShieldOnDamage( entity ent, var damageInfo )
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.move_slow, 0.5, 1.0, 1.0 )
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 1.0, 1.0 )
 		StatusEffect_AddTimed( ent, eStatusEffect.emp, 1.0, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+	}
+
+	entity mainWeapon = attacker.GetOffhandWeapon( OFFHAND_LEFT )
+
+	if(IsValid(mainWeapon)){
+		if ( mainWeapon.HasMod( "fd_terminator" ) )
+			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
 	}
 
 	if ( false )//ent.IsPlayer() || ent.IsNPC() )

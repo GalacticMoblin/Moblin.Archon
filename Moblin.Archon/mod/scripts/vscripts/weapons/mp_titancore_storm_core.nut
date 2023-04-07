@@ -8,6 +8,7 @@ global function OnWeaponActivate_titancore_storm_core
 global function OnAbilityCharge_Storm_Core
 global function OnAbilityChargeEnd_Storm_Core
 global function OnWeaponPrimaryAttack_titancore_storm_core
+global function OnProjectileCollision_titancore_storm_core
 
 const FX_EMP_FIELD						= $"P_xo_emp_field"
 const FX_EMP_GLOW             = $"P_titan_core_atlas_charge"
@@ -123,7 +124,18 @@ void function FireStormBall( entity weapon, vector pos, vector dir, bool shouldP
 
 	int flags = DF_EXPLOSION | DF_STOPS_TITAN_REGEN | DF_DOOM_FATALITY | DF_SKIP_DAMAGE_PROT
 
-	entity bolt = weapon.FireWeaponBolt( pos, dir, speed, damageTypes.arcCannon | DF_ELECTRICAL, damageTypes.arcCannon | DF_EXPLOSION, shouldPredict, 0 )
+	entity bolt = null
+	if( weapon.HasMod("fd_rolling_thunder") ){
+		vector angularVelocity = Vector( 0, 0, 0 )
+
+		vector bulletVec = ApplyVectorSpread( dir, owner.GetAttackSpreadAngle() * 2 )
+		print("BULLET VECTOR: " + bulletVec)
+
+		bolt = weapon.FireWeaponGrenade( pos, bulletVec, angularVelocity, 0.0 , damageTypes.arcCannon | DF_ELECTRICAL, damageTypes.arcCannon | DF_EXPLOSION, shouldPredict, true, true )
+	}
+	else{
+		bolt = weapon.FireWeaponBolt( pos, dir, speed, damageTypes.arcCannon | DF_ELECTRICAL, damageTypes.arcCannon | DF_EXPLOSION, shouldPredict, 0 )
+	}
 	if ( bolt != null )
 	{
 		bolt.kv.rendercolor = "0 0 0"
@@ -163,6 +175,34 @@ void function FireStormBall( entity weapon, vector pos, vector dir, bool shouldP
 		#endif
 	}
 }
+
+void function OnProjectileCollision_titancore_storm_core( entity projectile, vector pos, vector normal, entity hitEnt, int hitbox, bool isCritical )
+{
+	#if SERVER
+	if(IsValid(projectile) && IsValid(projectile.GetOwner()))
+	{
+		if( projectile.ProjectileGetMods().contains( "fd_rolling_thunder" ) )
+		{
+			projectile.proj.projectileBounceCount++
+			if ( projectile.proj.projectileBounceCount > 2 )
+			{
+					projectile.GrenadeExplode( <0,0,0> )
+
+				return
+			}
+			else{
+				var impact_effect_table = projectile.ProjectileGetWeaponInfoFileKeyField( "impact_effect_table" )
+				if ( impact_effect_table != null )
+				{
+					string fx = expect string( impact_effect_table )
+					PlayImpactFXTable( pos, projectile.GetOwner(), fx )
+				}
+			}
+		}
+	}
+	#endif
+}
+
 
 #if SERVER
 void function UpdateStormCoreField( entity owner, entity bolt, entity weapon, vector origin, float lifetime )
@@ -294,7 +334,6 @@ void function StormCoreSmokescreen( entity bolt, asset fx, entity owner )
 	smokescreen.weaponOrProjectile = bolt
 	smokescreen.damageInnerRadius = 50
 	smokescreen.damageOuterRadius = 210
-	//smokescreen.dangerousAreaRadius = smokescreen.damageOuterRadius * 1.5
 	smokescreen.damageDelay = 1.0
 	smokescreen.dpsPilot = 150
 	smokescreen.dpsTitan = 800

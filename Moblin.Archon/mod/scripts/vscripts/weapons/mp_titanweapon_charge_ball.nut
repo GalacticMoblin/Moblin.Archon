@@ -46,20 +46,10 @@ var function OnWeaponPrimaryAttack_weapon_titanweapon_charge_ball( entity weapon
 			return
 	#endif
 
-	float speed = 200.0
-
 	var fireMode = weapon.GetWeaponInfoFileKeyField( "fire_mode" )
 
 	vector attackPos = attackParams.pos
 	vector attackDir = attackParams.dir
-
-	if ( fireMode == "offhand_instant" )
-	{
-		// Get missile firing information
-		entity owner = weapon.GetWeaponOwner()
-		if ( owner.IsPlayer() )
-			attackDir = GetVectorFromPositionToCrosshair( owner, attackParams.pos )
-	}
 
 	float charge = weapon.GetWeaponChargeFraction()
 	float angleoffset = 0.05
@@ -79,7 +69,11 @@ var function OnWeaponPrimaryAttack_weapon_titanweapon_charge_ball( entity weapon
 		float finalMultiplier = angleMultiplier*i
 		int damageSplitter = extraBallAmount+1
 		float zapDamage = 300.0 / damageSplitter
-		FireArcBall( weapon, attackPos, attackDir + rightVec * angleoffset*finalMultiplier, shouldPredict, zapDamage ) //Need to define these in KV, 5 balls is 85 DMG, 3 is 125, 1 is 250
+		if( weapon.HasMod( "fd_balance" ) )
+			float zapDamage = zapDamage * 0.9
+		FireArcBall( weapon, attackPos, attackDir + rightVec * angleoffset*finalMultiplier, shouldPredict, zapDamage )
+		//Single = 300 per, Triple = 150 per, Thylord = 100 per
+		//270, 135, 90 in FD
 	}
 	weapon.EmitWeaponSound_1p3p( "Weapon_ArcLauncher_Fire_1P", "Weapon_ArcLauncher_Fire_3P" )
 	weapon.EmitWeaponNpcSound( LOUD_WEAPON_AI_SOUND_RADIUS_MP, 0.2 )
@@ -88,17 +82,12 @@ var function OnWeaponPrimaryAttack_weapon_titanweapon_charge_ball( entity weapon
 
 bool function OnWeaponChargeBegin_titanweapon_charge_ball( entity weapon )
 {
-	local stub = "this is here to suppress the untyped message.  This can go away when the .s. usage is removed from this file."
 	weapon.EmitWeaponSound("Weapon_EnergySyphon_Charge_3P")
 
 	#if CLIENT
 		if ( !IsFirstTimePredicted() )
 			return true
 	#endif
-
-
-	//entity weaponOwner = weapon.GetWeaponOwner()
-	//weapon.PlayWeaponEffect( ARCBALL2_CHARGE_FX_1P, ARCBALL2_CHARGE_FX_3P, "muzzle_flash" )
 
 	return true
 }
@@ -110,9 +99,6 @@ void function OnWeaponChargeEnd_titanweapon_charge_ball( entity weapon )
 		if ( !IsFirstTimePredicted() )
 			return
 	#endif
-
-
-	//weapon.StopWeaponEffect( ARCBALL2_CHARGE_FX_1P, ARCBALL2_CHARGE_FX_3P )
 }
 
 void function ChargeBallOnDamage( entity ent, var damageInfo )
@@ -121,4 +107,15 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
 
 	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+
+	entity attacker = DamageInfo_GetAttacker( damageInfo )
+	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
+
+	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
+		return
+
+	if( IsValid( weapon ) ){
+		if ( weapon.HasMod( "fd_terminator" ) )
+			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
+	}
 }

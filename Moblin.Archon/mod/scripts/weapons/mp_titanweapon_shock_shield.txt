@@ -218,13 +218,15 @@ WeaponData
 		{
 			"is_burn_mod"   							"1"
 		}
-		fd_enhanced_shocking
-		{
-			"hud_icon"										"archon/hud/fd_overtuned_amplifier"
-		}
 		fd_eye_of_the_storm
 		{
 			//Gives arc field to shock shield
+			"hud_icon"										"archon/hud/fd_eye_of_the_storm"
+			//"charge_time"									"*1.5"
+		}
+		fd_terminator
+		{
+			//Used for Aegis modes only
 		}
 		burn_mod_shock_shield
 		{

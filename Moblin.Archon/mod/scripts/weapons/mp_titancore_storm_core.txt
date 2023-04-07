@@ -5,8 +5,8 @@ WeaponData
   "description"									"#TITANCORE_STORM_DESC"
   "longdesc"										"#TITANCORE_STORM_DESC"
 
-	"menu_icon"										"archon/menu/storm_core"
-	"hud_icon"										"archon/menu/storm_core"
+	"menu_icon"										"archon/hud/storm_core"
+	"hud_icon"										"archon/hud/storm_core"
 
 	// General
 	"weaponClass" 									"titan"
@@ -38,6 +38,7 @@ WeaponData
 	"OnWeaponChargeEnd"								"OnAbilityChargeEnd_Storm_Core"
 	"OnWeaponAttemptOffhandSwitch"					"CheckCoreAvailable"
   "OnWeaponActivate"					"OnWeaponActivate_titancore_storm_core"
+  "OnProjectileCollision"								"OnProjectileCollision_titancore_storm_core"
 
 	"offhand_keep_primary_in_hand" 					"1"
 	"aimassist_disable_hipfire_humansonly"			"1"
@@ -76,7 +77,6 @@ WeaponData
 	"projectilemodel" 								"models/dev/empty_model.mdl"
 
   "projectile_trail_effect_0" 					"P_wpn_arcball_trail"
-  //"projectile_trail_attachment" 					"FX_GLOW"
 	"impact_effect_table" 							"exp_arc_ball"
 	"vortex_impact_sound_1p"						"vortex_shield_deflect_amped"
 	"vortex_impact_sound_3p"						"vortex_shield_deflect_amped"
@@ -103,6 +103,14 @@ WeaponData
 	"charge_wave_step_dist"							"120.0"
 
 	//"special_3p_attack_anim" 						"1"
+
+  "grenade_bounce_vel_frac_shallow"				"0.0"
+  "grenade_bounce_vel_frac_sharp"					"0.0"
+  "grenade_bounce_vel_frac_along_normal"			"0.0"
+  "grenade_bounce_randomness"						"0.0"
+  "grenade_bounce_extra_vertical_randomness"		"0.0"
+  "grenade_roll_vel_frac_per_second"				"0.0"
+  "projectile_launch_speed"						"1"
 
 	MP_BASE
 	{
@@ -150,5 +158,15 @@ WeaponData
 		{
       //spawns a cloud of electric smoke on impact
 		}
+    fd_rolling_thunder
+    {
+      "grenade_bounce_vel_frac_shallow"				"0.75"
+      "grenade_bounce_vel_frac_sharp"					"0.7"
+      "grenade_bounce_vel_frac_along_normal"			"0.8"
+      "grenade_bounce_randomness"						"0"
+      "grenade_bounce_extra_vertical_randomness"		"0"
+      "grenade_roll_vel_frac_per_second"				"0"
+      "projectile_launch_speed"						"1000"
+    }
 	}
 }

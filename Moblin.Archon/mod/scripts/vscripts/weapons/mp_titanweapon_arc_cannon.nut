@@ -68,32 +68,6 @@ global const ARCHON_CANNON_BEAM_EFFECT_SF = $"wpn_arc_cannon_beam" //$"wpn_arc_c
 global const ARCHON_CANNON_FX_TABLE = "exp_arc_cannon"
 global const ARCHON_CANNON_FX_TABLE_SF = "exp_arc_cannon" //"exp_arc_cannon_st"
 
-global const ArchonCannonTargetClassnames = {
-	[ "npc_drone" ] 			= true,
-	[ "npc_dropship" ] 			= true,
-	[ "npc_marvin" ] 			= true,
-	[ "npc_prowler" ]			= true,
-	[ "npc_soldier" ] 			= true,
-	[ "npc_soldier_heavy" ] 	= true,
-	[ "npc_soldier_shield" ]	= true,
-	[ "npc_spectre" ] 			= true,
-	[ "npc_stalker" ] 			= true,
-	[ "npc_super_spectre" ]		= true,
-	[ "npc_titan" ] 			= true,
-	[ "npc_turret_floor" ] 		= true,
-	[ "npc_turret_mega" ]		= true,
-	[ "npc_turret_sentry" ] 	= true,
-	[ "npc_frag_drone" ] 		= true,
-	[ "player" ] 				= true,
-	[ "prop_dynamic" ] 			= true,
-	[ "prop_script" ] 			= true,
-	[ "grenade_frag" ] 			= true,
-	[ "grenade" ] 			= true,
-	[ "rpg_missile" ] 			= true,
-	[ "script_mover" ] 			= true,
-	[ "turret" ] 				= true,
-}
-
 function ArchonArcCannon_Init()
 {
 	RegisterSignal( ARCHON_CANNON_SIGNAL_DEACTIVATED )
@@ -244,6 +218,11 @@ void function ArcCannonOnDamage( entity ent, var damageInfo )
 		StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.2*damageMultiplier, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 
 		float staticFeedbackAmount = 0.05 //1/20 or 5%
+
+		if(IsValid(mainWeapon)){
+			if ( mainWeapon.HasMod( "fd_terminator" ) )
+				UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
+		}
 
 		if(mainWeapon.HasMod("static_feedback"))
 		{
@@ -398,11 +377,15 @@ function FireArchonCannon( entity weapon, WeaponPrimaryAttackParams attackParams
 	local muzzleOrigin = weapon.GetAttachmentOrigin( attachmentIndex )
 
 	table firstTargetInfo = GetFirstArcCannonTarget( weapon, attackParams )
-	if ( !IsValid( firstTargetInfo.target ) )
+	//printt("THIS IS MY FIRST TARGET: " + firstTargetInfo.target)
+	if ( !IsValid( firstTargetInfo.target ) ){
 		FireArcNoTargets( weapon, attackParams, muzzleOrigin )
-	else
+		//printt("I FIRED WITH NO TARGETS")
+	}
+	else{
 		FireArcWithTargets( weapon, firstTargetInfo, attackParams, muzzleOrigin )
-
+		//printt("I FIRED WITH TARGETS YOU FUCK")
+	}
 	return 1
 }
 
@@ -431,47 +414,35 @@ table function GetFirstArcCannonTarget( entity weapon, WeaponPrimaryAttackParams
 	firstTargetInfo.hitLocation <- null
 	firstTargetInfo.hitBox <- null
 
-	for ( int i = 0; i < 2; i++ )
+	local coneAngle = angleToAxis
+	coneAngle = clamp( coneAngle, 0.1, 89.9 )
+
+	array<VisibleEntityInCone> results = FindVisibleEntitiesInCone( attackParams.pos, attackParams.dir, coneHeight, coneAngle, ignoredEntities, traceMask, flags, antilagPlayer )
+	foreach ( result in results )
 	{
-		local coneAngle = angleToAxis
-		coneAngle = clamp( coneAngle, 0.1, 89.9 )
+		//printt("I CAN SEE SHIT")
+		//print(result.ent)
+		//print(result.visibleHitbox)
+		entity visibleEnt = result.ent
 
-		array<VisibleEntityInCone> results = FindVisibleEntitiesInCone( attackParams.pos, attackParams.dir, coneHeight, coneAngle, ignoredEntities, traceMask, flags, antilagPlayer )
-		foreach ( result in results )
+		if ( !IsValid( visibleEnt ) )
+			continue
+
+		if ( visibleEnt.IsPhaseShifted() )
+			continue
+
+		if ( "GetTeam" in visibleEnt )
 		{
-			//print("" + result.ent)
-			print(result.ent)
-			print(result.visibleHitbox)
-			entity visibleEnt = result.ent
-
-			if ( !IsValid( visibleEnt ) )
+			int visibleEntTeam = visibleEnt.GetTeam()
+			if ( IsEntANeutralMegaTurret_Archon( visibleEnt, ownerTeam ) )
 				continue
-
-			if ( visibleEnt.IsPhaseShifted() )
-				continue
-
-			local classname = IsServer() ? visibleEnt.GetClassName() : visibleEnt.GetSignifierName()
-
-			//if ( !( classname in ArchonCannonTargetClassnames ) )
-				//continue
-
-			if ( "GetTeam" in visibleEnt )
-			{
-				int visibleEntTeam = visibleEnt.GetTeam()
-				if ( visibleEntTeam == ownerTeam )
-					continue
-				if ( IsEntANeutralMegaTurret_Archon( visibleEnt, ownerTeam ) )
-					continue
-			}
-
-			expect string( classname )
-			string targetname = visibleEnt.GetTargetName()
-
-			firstTargetInfo.target = visibleEnt
-			firstTargetInfo.hitLocation = result.visiblePosition
-			firstTargetInfo.hitBox = result.visibleHitbox
-			break
 		}
+
+		firstTargetInfo.target = visibleEnt
+		firstTargetInfo.hitLocation = result.visiblePosition
+		firstTargetInfo.hitBox = result.visibleHitbox
+		//printt(visibleEnt)
+		//printt(firstTargetInfo.target)
 	}
 	//Creating a whiz-by sound.
 	weapon.FireWeaponBullet_Special( attackParams.pos, attackParams.dir, 1, 0, true, true, true, true, true, false, false )
@@ -490,10 +461,6 @@ function FireArcNoTargets( entity weapon, WeaponPrimaryAttackParams attackParams
 	local beamEnd = traceResults.endPos
 
 	VortexBulletHit ornull vortexHit = VortexBulletHitCheck( player, playerEyePos, beamEnd )
-
-	weapon.FireWeaponBullet_Special( attackParams.pos, attackParams.dir, 0, damageTypes.arcCannon | DF_BULLET, true, true, false, true, true, false, false )
-	//DF_BULLET
-
 
 	if ( vortexHit )
 	{
@@ -555,7 +522,7 @@ function FireArcWithTargets( entity weapon, table firstTargetInfo, WeaponPrimary
 	local maxChains
 	local minChains
 
-	if ( weapon.HasMod( "chain_reaction" ) || weapon.HasMod( "fd_enhanced_shocking" ))
+	if ( weapon.HasMod( "chain_reaction" ) )
 	{
 		if ( player.IsNPC() )
 			maxChains = ARCHON_CANNON_CHAIN_COUNT_NPC_BURN
@@ -894,9 +861,6 @@ array<entity> function GetArcCannonChainTargets( vector fromOrigin, entity fromT
 	foreach ( ent in allTargets )
 	{
 		local forkCount = ARCHON_CANNON_FORK_COUNT_MAX
-		if ( zapInfo.weapon.HasMod( "fd_enhanced_shocking" ) )
-			forkCount = forkCount + 2
-
 		if ( zapInfo.weapon.HasMod( "chain_reaction" ) )
 			forkCount = forkCount + 2
 
@@ -1033,29 +997,11 @@ array<entity> function GetArcCannonTargetsInRange( vector origin, int team, enti
 	array<entity> allTargets = GetArcCannonTargets( origin, team )
 	array<entity> targetsInRange
 
-	float titanDistSq
-	float distSq
-	if ( weapon.HasMod( "fd_enhanced_shocking" ) )
-	{
-		titanDistSq = ARCHON_CANNON_TITAN_RANGE_CHAIN_BURN * ARCHON_CANNON_TITAN_RANGE_CHAIN_BURN
-		distSq = ARCHON_CANNON_RANGE_CHAIN_BURN * ARCHON_CANNON_RANGE_CHAIN_BURN
-	}
-	else
-	{
-		titanDistSq = ARCHON_CANNON_TITAN_RANGE_CHAIN * ARCHON_CANNON_TITAN_RANGE_CHAIN
-		distSq = ARCHON_CANNON_RANGE_CHAIN * ARCHON_CANNON_RANGE_CHAIN
-	}
-
+	float titanDistSq = ARCHON_CANNON_TITAN_RANGE_CHAIN * ARCHON_CANNON_TITAN_RANGE_CHAIN
+	float distSq = ARCHON_CANNON_RANGE_CHAIN * ARCHON_CANNON_RANGE_CHAIN
 
 	foreach( target in allTargets )
 	{
-		if(target.GetTargetName() == "Arc Ball" && target.GetOwner() == weapon.GetWeaponOwner())
-		{
-			//print("Range extended")
-			titanDistSq = ARCHON_CANNON_TITAN_RANGE_CHAIN * ARCHON_CANNON_TITAN_RANGE_CHAIN * 1.5
-			distSq = ARCHON_CANNON_RANGE_CHAIN * ARCHON_CANNON_RANGE_CHAIN * 1.5
-		}
-
 		float d = DistanceSqr( target.GetOrigin(), origin )
 		float validDist = target.IsTitan() ? titanDistSq : distSq
 		if ( d <= validDist )
@@ -1121,7 +1067,7 @@ function CreateArchonCannonBeam( weapon, target, startPos, endPos, player, lifeD
 
 function GetBeamEffect( weapon )
 {
-	if ( weapon.HasMod( "fd_enhanced_shocking" ) || weapon.HasMod( "chain_reaction" ) )
+	if ( weapon.HasMod( "chain_reaction" ) )
 		return ARCHON_CANNON_BEAM_EFFECT_ENHANCED
 
 	if ( weapon.HasMod( "static_feedback" ) )

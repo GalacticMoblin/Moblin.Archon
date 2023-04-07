@@ -11,23 +11,14 @@ WeaponData
 	"pickup_press_prompt" 							"[USE] [WEAPONNAME]"
 	"minimap_reveal_distance"						"32000"
 
-
 	"menu_icon"										"archon/hud/arc_cannon"
 	"hud_icon"										"archon/hud/arc_cannon"
-
-
-	// Menu Stats
-	"stat_damage" 									"85"
-	"stat_range"  									"35"
-	"stat_accuracy"   								"80"
-	"stat_rof"										"20"
 
 	// Models
 	"viewmodel"   									"models/weapons/titan_arc_rifle/atpov_titan_arc_rifle.mdl"
 	"playermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
 	"projectilemodel" 									"models/dev/empty_model.mdl"
 	"anim_prefix" 									"ar2"
-
 
 	"OnWeaponActivate" 							"OnWeaponActivate_titanweapon_arc_cannon_archon"
 	"OnWeaponDeactivate"							"OnWeaponDeactivate_titanweapon_arc_cannon_archon"
@@ -37,8 +28,6 @@ WeaponData
 	"OnWeaponPrimaryAttack"							"OnWeaponPrimaryAttack_titanweapon_arc_cannon_archon"
 	"OnWeaponNpcPrimaryAttack"						"OnWeaponNpcPrimaryAttack_titanweapon_arc_cannon_archon"
 	"impulse_force"   								"1000"
-
-
 
 	// Effects
 	//"tracer_effect"   								"weapon_tracers_xo16"
@@ -124,8 +113,9 @@ WeaponData
 	"charge_effect_attachment"						"muzzle_flash"
 
 	// Spread
-	"spread_stand_hip"  							"10"
-	"spread_npc"  									"2"
+	"spread_stand_hip"  							"0"
+	"spread_stand_ads"   							"0"
+	"spread_npc"  									"0"
 
 	"ammo_suck_behavior"							"primary_weapons"
 
@@ -349,7 +339,7 @@ WeaponData
 		Crosshair_2
 		{
 			"ui"						"ui/crosshair_circle2"
-			"base_spread"				"0.0"
+			"base_spread"				"10.0"
 			Args
 			{
 				isFiring				weapon_is_firing
