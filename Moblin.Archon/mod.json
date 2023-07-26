@@ -57,7 +57,7 @@
             "RunOn": "( CLIENT || SERVER ) && MP",
         },
         {
-            "Path": "weapons/mp_titanweapon_arc_cannon.nut",
+            "Path": "weapons/mp_titanweapon_archon_arc_cannon.nut",
             "RunOn": "( CLIENT || SERVER ) && MP",
         },
         {

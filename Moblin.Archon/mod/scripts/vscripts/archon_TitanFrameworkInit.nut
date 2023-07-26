@@ -27,7 +27,7 @@ void function ArchonUIInit()
 		ModdedTitanWeaponAbilityData ArcCannon
 		ArcCannon.custom = true
 		ArcCannon.displayName = "#WPN_TITAN_ARC_CANNON"
-		ArcCannon.weaponName = "mp_titanweapon_arc_cannon"
+		ArcCannon.weaponName = "mp_titanweapon_archon_arc_cannon"
 		ArcCannon.description = "#WPN_TITAN_ARC_CANNON_LONGDESC"
 		ArcCannon.image = $"archon/hud/arc_cannon"
 		Archon.Primary = ArcCannon

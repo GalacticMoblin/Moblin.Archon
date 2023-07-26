@@ -11,7 +11,7 @@ global function ConeDamageTethersException
 #endif
 
 const float TERMINATOR_EFFECT_LENGTH = 20.0
-const int FD_TERMINATOR_DAMAGE_MAX = 10000
+const int FD_TERMINATOR_DAMAGE_MAX = 8000
 
 struct
 {

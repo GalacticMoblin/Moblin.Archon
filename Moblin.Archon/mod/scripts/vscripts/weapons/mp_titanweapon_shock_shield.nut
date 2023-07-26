@@ -157,7 +157,7 @@ function StartVortex( entity weapon )
 
 	Vortex_SetBulletCollectionOffset( weapon, Vector( 110, -28, -22.0 ) )
 
-	int sphereRadius = 350
+	int sphereRadius = 120
 	int bulletFOV = 120
 
 	//ApplyActivationCost( weapon, ACTIVATION_COST_FRAC )
@@ -502,7 +502,7 @@ void function ActivateShockShieldArcField( entity weapon )
 	{
 		entity owner = weapon.GetWeaponOwner()
 
-		local attachment = GetEMPAttachmentForTitan( owner )
+		local attachment = "hijack"
 
 		local attachID = owner.LookupAttachment( attachment )
 
@@ -522,7 +522,7 @@ void function ActivateShockShieldArcField( entity weapon )
 			particleSystem.SetOrigin( origin )
 			particleSystem.SetOwner( owner )
 			DispatchSpawn( particleSystem )
-			particleSystem.SetParent( owner, GetEMPAttachmentForTitan( owner ) )
+			particleSystem.SetParent( owner, "hijack" )
 			particles.append( particleSystem )
 		}
 
@@ -536,12 +536,8 @@ void function ActivateShockShieldArcField( entity weapon )
 		particleSystem.SetOwner( owner )
 		particleSystem.SetOrigin( origin )
 		DispatchSpawn( particleSystem )
-		particleSystem.SetParent( owner, GetEMPAttachmentForTitan( owner ) )
+		particleSystem.SetParent( owner, "hijack" )
 		particles.append( particleSystem )
-
-		//PlayFXOnEntity( FX_EMP_FIELD, owner, "", <0, 0, 0> )
-
-		//vector origin = owner.OffsetPositionFromView( <0, 0, 0>, <25, -25, 15> )
 
 		thread UpdateShockShieldField( weapon )
 
@@ -595,8 +591,8 @@ function ShockShieldFieldDamage( entity weapon, vector origin )
 		origin,									// center
 		weapon.GetWeaponOwner(),									// attacker
 		weapon,									// inflictor
-		30,					// damage
-		100,					// damageHeavyArmor
+		40,					// damage
+		120,					// damageHeavyArmor
 		ARC_TITAN_EMP_FIELD_INNER_RADIUS,		// innerRadius
 		ARC_TITAN_EMP_FIELD_RADIUS,				// outerRadius
 		SF_ENVEXPLOSION_NO_DAMAGEOWNER,			// flags
@@ -606,8 +602,3 @@ function ShockShieldFieldDamage( entity weapon, vector origin )
 		eDamageSourceId.mp_titanweapon_shock_shield )			// scriptDamageSourceIdentifier
 }
 #endif
-
-string function GetEMPAttachmentForTitan( entity titan )
-{
-	return  "hijack"
-}
