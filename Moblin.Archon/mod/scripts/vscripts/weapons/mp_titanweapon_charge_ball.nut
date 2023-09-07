@@ -109,11 +109,17 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 
 	entity attacker = DamageInfo_GetAttacker( damageInfo )
-	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
-
+	// check attacker validation before getting their weapon
 	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
 		return
+	// for npc titans without a pettitan owner
+	// the inflictor( ball lightning mover ) can become attacker after they're destroyed
+	// needs to add a check, otherwise attacker.GetOffhandWeapon(OFFHAND_RIGHT) may crash the server
+	if ( !( attacker instanceof CBaseCombatCharacter ) )
+		return
 
+	// safe to get attacker weapon after all checks
+	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
 	if( IsValid( weapon ) ){
 		if ( weapon.HasMod( "fd_terminator" ) )
 			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
