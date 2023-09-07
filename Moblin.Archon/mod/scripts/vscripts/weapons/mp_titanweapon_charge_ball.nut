@@ -101,6 +101,7 @@ void function OnWeaponChargeEnd_titanweapon_charge_ball( entity weapon )
 	#endif
 }
 
+#if SERVER // CBaseCombatCharacter only exists on server-side
 void function ChargeBallOnDamage( entity ent, var damageInfo )
 {
 	entity attacker = DamageInfo_GetAttacker( damageInfo )
@@ -131,3 +132,4 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
 	}
 }
+#endif
