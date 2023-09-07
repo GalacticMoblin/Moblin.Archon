@@ -104,6 +104,11 @@ void function OnWeaponChargeEnd_titanweapon_charge_ball( entity weapon )
 #if SERVER // CBaseCombatCharacter only exists on server-side
 void function ChargeBallOnDamage( entity ent, var damageInfo )
 {
+	const ARC_TITAN_EMP_DURATION			= 0.35
+	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+
 	entity attacker = DamageInfo_GetAttacker( damageInfo )
 	// check attacker validation before getting their weapon
 	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
@@ -114,19 +119,13 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 	if ( !( attacker instanceof CBaseCombatCharacter ) )
 	{
 		// when a mover without valid owner damages player, it also causes crash on client-side
-		// to prevent that, simply remove the damage to avoid damage indicator shows up on client
-		DamageInfo_SetDamage( damageInfo, 0 )
+		// to prevent that, try adding DF_NO_INDICATOR to damageflags so client won't try to create a damage indicator for it
+		DamageInfo_AddCustomDamageType( damageInfo, DF_NO_INDICATOR )
 		return
 	}
 
-	// all checks passed, it's now safe to do emp screen effect and get attacker's weapon
-	const ARC_TITAN_EMP_DURATION			= 0.35
-	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
-
-	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
-	
+	// all checks passed, it's now safe to get attacker's weapon
 	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
-
 	if( IsValid( weapon ) ){
 		if ( weapon.HasMod( "fd_terminator" ) )
 			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
