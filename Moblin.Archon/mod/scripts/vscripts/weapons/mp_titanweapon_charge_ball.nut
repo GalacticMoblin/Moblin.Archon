@@ -103,11 +103,6 @@ void function OnWeaponChargeEnd_titanweapon_charge_ball( entity weapon )
 
 void function ChargeBallOnDamage( entity ent, var damageInfo )
 {
-	const ARC_TITAN_EMP_DURATION			= 0.35
-	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
-
-	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
-
 	entity attacker = DamageInfo_GetAttacker( damageInfo )
 	// check attacker validation before getting their weapon
 	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
@@ -116,10 +111,21 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 	// the inflictor( ball lightning mover ) can become attacker after they're destroyed
 	// needs to add a check, otherwise attacker.GetOffhandWeapon(OFFHAND_RIGHT) may crash the server
 	if ( !( attacker instanceof CBaseCombatCharacter ) )
+	{
+		// when a mover without valid owner damages player, it also causes crash on client-side
+		// to prevent that, simply remove the damage to avoid damage indicator shows up on client
+		DamageInfo_SetDamage( damageInfo, 0 )
 		return
+	}
 
-	// safe to get attacker weapon after all checks
+	// all checks passed, it's now safe to do emp screen effect and get attacker's weapon
+	const ARC_TITAN_EMP_DURATION			= 0.35
+	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+	
 	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
+
 	if( IsValid( weapon ) ){
 		if ( weapon.HasMod( "fd_terminator" ) )
 			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
