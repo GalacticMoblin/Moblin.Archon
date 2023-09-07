@@ -109,7 +109,7 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
 		return
 	// for npc titans without a pettitan owner
-	// the inflictor( ball lightning mover ) can become attacker after they're destroyed
+	// the inflictor( ball lightning mover ) can become attacker after their owner getting destroyed
 	// needs to add a check, otherwise attacker.GetOffhandWeapon(OFFHAND_RIGHT) may crash the server
 	if ( !( attacker instanceof CBaseCombatCharacter ) )
 	{
