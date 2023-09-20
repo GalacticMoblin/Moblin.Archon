@@ -101,6 +101,7 @@ void function OnWeaponChargeEnd_titanweapon_charge_ball( entity weapon )
 	#endif
 }
 
+#if SERVER // CBaseCombatCharacter only exists on server-side
 void function ChargeBallOnDamage( entity ent, var damageInfo )
 {
 	const ARC_TITAN_EMP_DURATION			= 0.35
@@ -109,13 +110,25 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 
 	entity attacker = DamageInfo_GetAttacker( damageInfo )
-	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
-
+	// check attacker validation before getting their weapon
 	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
 		return
+	// for npc titans without a pettitan owner
+	// the inflictor( ball lightning mover ) can become attacker after their owner getting destroyed
+	// needs to add a check, otherwise attacker.GetOffhandWeapon(OFFHAND_RIGHT) may crash the server
+	if ( !( attacker instanceof CBaseCombatCharacter ) )
+	{
+		// when a mover without valid owner damages player, it also causes crash on client-side
+		// to prevent that, try adding DF_NO_INDICATOR to damageflags so client won't try to create a damage indicator for it
+		DamageInfo_AddCustomDamageType( damageInfo, DF_NO_INDICATOR )
+		return
+	}
 
+	// all checks passed, it's now safe to get attacker's weapon
+	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
 	if( IsValid( weapon ) ){
 		if ( weapon.HasMod( "fd_terminator" ) )
 			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
 	}
 }
+#endif
