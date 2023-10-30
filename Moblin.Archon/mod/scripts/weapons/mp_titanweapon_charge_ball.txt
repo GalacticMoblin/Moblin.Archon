@@ -71,6 +71,12 @@ WeaponData
 	"damage_far_distance" 							"15000"
 	"damage_heavyarmor_nontitan_scale"				"0.5"
 
+	// npc explosion damage
+	// it's weird that npc can't deal any explosion damage if not setting them up
+	// unlike direct damage, which npcs will use player values by default
+	"npc_explosion_damage"							"60"
+	"npc_explosion_damage_heavy_armor"				"200"
+
 	"bolt_gravity_enabled"							"0"
 
 	"explosion_inner_radius"  						"150"
