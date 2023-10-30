@@ -227,13 +227,9 @@ WeaponData
 
 	active_crosshair_count				"1"
 	rui_crosshair_index					"0"
+	
 
 	// Third Person Animation
-	// activitymodifier's default value is weapon's class name
-	// respawn hardcode every weapon's "activitymodifier" in titan's qc files, instead of using a name such as "rocket_pod"
-	// which means, we'll need to set an activitymodifier for modded weapons using vanilla weapon's name
-	// otherwise they'll pick a random animation from current activity
-	
 	"activitymodifier"								"mp_titanweapon_laser_lite" // makes titan raise shoulder laser while charging the weapon
 
 	//Mods (Kits)
