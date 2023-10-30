@@ -212,6 +212,15 @@ WeaponData
 	// Crosshair
 	"red_crosshair_range" 							"1500"
 
+
+	// Third Person Animation
+	// activitymodifier's default value is weapon's class name
+	// respawn hardcode every weapon's "activitymodifier" in titan's qc files, instead of using a name such as "rocket_pod"
+	// which means, we'll need to set an activitymodifier for modded weapons using vanilla weapon's name
+	// otherwise they'll pick a random animation from current activity
+	
+	"activitymodifier"								"mp_titanweapon_vortex_shield" // makes titan use vortex shield's blocking animation
+
 	Mods
 	{
 		bolt_from_the_blue

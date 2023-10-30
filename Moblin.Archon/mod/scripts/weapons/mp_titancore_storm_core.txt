@@ -152,6 +152,15 @@ WeaponData
 	"npc_min_range"   								"0"
 	"npc_max_range"   								"1700"
 
+
+	// Third Person Animation
+	// activitymodifier's default value is weapon's class name
+	// respawn hardcode every weapon's "activitymodifier" in titan's qc files, instead of using a name such as "rocket_pod"
+	// which means, we'll need to set an activitymodifier for modded weapons using vanilla weapon's name
+	// otherwise they'll pick a random animation from current activity
+	
+	"activitymodifier"								"mp_titancore_laser_cannon" // makes titan use laser core's standing animation
+
 	Mods
 	{
 		bring_the_thunder

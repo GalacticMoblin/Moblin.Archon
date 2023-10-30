@@ -249,6 +249,15 @@ WeaponData
 
 	"is_burn_mod"									"0"
 
+
+	// Third Person Animation
+	// activitymodifier's default value is weapon's class name
+	// respawn hardcode every weapon's "activitymodifier" in titan's qc files, instead of using a name such as "rocket_pod"
+	// which means, we'll need to set an activitymodifier for modded weapons using vanilla weapon's name
+	// otherwise they'll pick a random animation from current activity
+	
+	"activitymodifier"								"mp_titanweapon_particle_accelerator" // makes titan use splitter rifle's standing animation
+
 	Mods
 	{
 		chain_reaction //Increases Chains by +2
