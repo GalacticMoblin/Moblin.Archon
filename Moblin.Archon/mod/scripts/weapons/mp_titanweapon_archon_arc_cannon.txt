@@ -17,6 +17,7 @@ WeaponData
 	// Models
 	"viewmodel"   									"models/weapons/titan_arc_rifle/atpov_titan_arc_rifle.mdl"
 	"playermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
+	"holstermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
 	"projectilemodel" 									"models/dev/empty_model.mdl"
 	"anim_prefix" 									"ar2"
 
