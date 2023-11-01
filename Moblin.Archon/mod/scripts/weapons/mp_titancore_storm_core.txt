@@ -40,7 +40,6 @@ WeaponData
   "OnWeaponActivate"					"OnWeaponActivate_titancore_storm_core"
   "OnProjectileCollision"								"OnProjectileCollision_titancore_storm_core"
 
-	//"offhand_keep_primary_in_hand" 					"0"
 	"offhand_holster_primary"						"1" // make titan holster weapon just like laser core
 	"aimassist_disable_hipfire_humansonly"			"1"
 	"aimassist_disable_ads_humansonly"				"1"
