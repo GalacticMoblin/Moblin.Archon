@@ -83,8 +83,6 @@ WeaponData
 
 	"damage_type" 									"burn"
 
-	"activitymodifier"								"rocket"
-
 	// Effects
 	"projectile_trail_effect_0" 					"P_wpn_arcball_trail"
 	"impact_effect_table" 							"exp_arc_ball"
@@ -233,6 +231,10 @@ WeaponData
 
 	active_crosshair_count				"1"
 	rui_crosshair_index					"0"
+	
+
+	// Third Person Animation
+	"activitymodifier"								"mp_titanweapon_laser_lite" // makes titan raise shoulder laser while charging the weapon
 
 	//Mods (Kits)
 	Mods

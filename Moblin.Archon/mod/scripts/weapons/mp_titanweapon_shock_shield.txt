@@ -212,6 +212,10 @@ WeaponData
 	// Crosshair
 	"red_crosshair_range" 							"1500"
 
+
+	// Third Person Animation
+	"activitymodifier"								"mp_titanweapon_vortex_shield" // makes titan use vortex shield's blocking animation
+
 	Mods
 	{
 		bolt_from_the_blue

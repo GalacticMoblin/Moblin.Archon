@@ -40,7 +40,7 @@ WeaponData
   "OnWeaponActivate"					"OnWeaponActivate_titancore_storm_core"
   "OnProjectileCollision"								"OnProjectileCollision_titancore_storm_core"
 
-	"offhand_keep_primary_in_hand" 					"1"
+	"offhand_holster_primary"						"1" // make titan holster weapon just like laser core
 	"aimassist_disable_hipfire_humansonly"			"1"
 	"aimassist_disable_ads_humansonly"				"1"
 
@@ -151,6 +151,10 @@ WeaponData
 	"npc_vortex_block"								"0"
 	"npc_min_range"   								"0"
 	"npc_max_range"   								"1700"
+
+
+	// Third Person Animation
+	"activitymodifier"								"mp_titancore_laser_cannon" // makes titan use laser core's standing animation
 
 	Mods
 	{

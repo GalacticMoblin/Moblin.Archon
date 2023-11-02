@@ -17,6 +17,7 @@ WeaponData
 	// Models
 	"viewmodel"   									"models/weapons/titan_arc_rifle/atpov_titan_arc_rifle.mdl"
 	"playermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
+	"holstermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
 	"projectilemodel" 									"models/dev/empty_model.mdl"
 	"anim_prefix" 									"ar2"
 
@@ -248,6 +249,10 @@ WeaponData
 	"red_crosshair_range" 							"3000"
 
 	"is_burn_mod"									"0"
+
+
+	// Third Person Animation
+	"activitymodifier"								"mp_titanweapon_particle_accelerator" // makes titan use splitter rifle's standing animation
 
 	Mods
 	{
