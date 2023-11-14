@@ -91,6 +91,7 @@ function ArchonArcCannon_Init()
 	PrecacheWeapon( "mp_titanweapon_archon_arc_cannon" )
 
 	#if SERVER
+		// register a new damageSourceId using our new weapon's classname
 		RegisterWeaponDamageSource( "mp_titanweapon_archon_arc_cannon", "#WPN_TITAN_ARC_CANNON" )
 		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_archon_arc_cannon, ArcCannonOnDamage )
 	#endif
@@ -719,12 +720,12 @@ function ZapTarget( zapInfo, target, beamStartPos, beamEndPos, chainNum = 1 )
 				if ( owner.IsNPC() || weapon.GetWeaponClassName() == "mp_titanweapon_shock_shield")
 				{
 					damageAmount = maxDamageAmount
-					print("DAMAGE OUTPUT: " + damageAmount)
+					//print("DAMAGE OUTPUT: " + damageAmount)
 				}
 				else
 				{
 					damageAmount = maxDamageAmount * arcWeaponCharge
-					print("DAMAGE OUTPUT: " + damageAmount)
+					//print("DAMAGE OUTPUT: " + damageAmount)
 				}
 
 			}
