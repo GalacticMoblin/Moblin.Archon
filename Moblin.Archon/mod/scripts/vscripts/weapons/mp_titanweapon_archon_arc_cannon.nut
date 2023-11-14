@@ -91,10 +91,9 @@ function ArchonArcCannon_Init()
 	PrecacheWeapon( "mp_titanweapon_archon_arc_cannon" )
 
 	#if SERVER
-		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_arc_cannon, ArcCannonOnDamage )
+		RegisterWeaponDamageSource( "mp_titanweapon_archon_arc_cannon", "#WPN_TITAN_ARC_CANNON" )
+		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_archon_arc_cannon, ArcCannonOnDamage )
 	#endif
-
-	RegisterWeaponDamageSourceName( "mp_titanweapon_arc_cannon", "#WPN_TITAN_ARC_CANNON" )
 }
 
 void function OnWeaponActivate_titanweapon_arc_cannon_archon( entity weapon )
