@@ -23,6 +23,7 @@ void function ArchonPrecache()
 	#if SERVER
 	RegisterWeaponDamageSources(
 		{
+			mp_titanweapon_archon_arc_cannon = "#WPN_TITAN_ARC_CANNON",
 			mp_titanweapon_tesla_node = "#WPN_TITAN_TESLA_NODE",
 			mp_titanweapon_charge_ball = "#WPN_TITAN_CHARGE_BALL",
 			mp_titanweapon_shock_shield = "#WPN_TITAN_SHOCK_SHIELD",
