@@ -7,7 +7,7 @@
 Implements the Archon Titan based off of cut content.
 
 ### Activation
-Select your titan within the additional 3 titan slots provided by `Peepee.TitanFramework` and bring down your titan.
+At the bottom of the Titan Loadout page, press Custom Loadouts, press Create New Loadout and open it, press Select Titan, select Archon.
 
 ## Loadout
 
@@ -44,6 +44,8 @@ Select your titan within the additional 3 titan slots provided by `Peepee.TitanF
   - *Programming Support, Framework Developer*
 - **Spoon**
   - *Programmer, Writing Support*
+- **DBmaoha**
+  - *PR Contributor*
 
 *Special Thanks to the entire RePak Team and MDLShit Team.*
 
