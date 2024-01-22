@@ -34,7 +34,7 @@ At the bottom of the Titan Loadout page, press Custom Loadouts, press Create New
 ## Contributors
 - **GalacticMoblin** 
   - *Programmer, Playtester, Gameplay Designer, UI Designer, Writer*
-- **Hurb**
+- **Hurbski**
   - *Playtester, UI Designer, Concept Artist, Writer*
 - **Dinorush**
   - *Programmer*
