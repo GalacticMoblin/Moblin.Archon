@@ -8,6 +8,7 @@ global function OnWeaponOwnerChanged_titanweapon_arc_cannon_archon
 global function OnWeaponChargeBegin_titanweapon_arc_cannon_archon
 global function OnWeaponChargeEnd_titanweapon_arc_cannon_archon
 global function OnWeaponPrimaryAttack_titanweapon_arc_cannon_archon
+global function OnWeaponReadyToFire_titanweapon_arc_cannon_archon
 
 #if SERVER
 global function OnWeaponNpcPrimaryAttack_titanweapon_arc_cannon_archon
@@ -15,7 +16,6 @@ global function OnWeaponNpcPrimaryAttack_titanweapon_arc_cannon_archon
 
 global function FireArchonCannon
 global function ArchonCannon_HideOrShowIdleEffect
-global function GetArchonCannonChargeFraction
 
 global function IsEntANeutralMegaTurret_Archon
 global function CreateArchonCannonBeam
@@ -91,10 +91,8 @@ function ArchonArcCannon_Init()
 	PrecacheWeapon( "mp_titanweapon_archon_arc_cannon" )
 
 	#if SERVER
-		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_arc_cannon, ArcCannonOnDamage )
+		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_archon_arc_cannon, ArcCannonOnDamage )
 	#endif
-
-	RegisterWeaponDamageSourceName( "mp_titanweapon_arc_cannon", "#WPN_TITAN_ARC_CANNON" )
 }
 
 void function OnWeaponActivate_titanweapon_arc_cannon_archon( entity weapon )
@@ -104,30 +102,12 @@ void function OnWeaponActivate_titanweapon_arc_cannon_archon( entity weapon )
 
 	if( !("weaponOwner" in weapon.s) )
 		weapon.s.weaponOwner <- weaponOwner
-
-}
-
-function DelayedArcCannonStart( entity weapon, entity weaponOwner )
-{
-	weapon.EndSignal( "WeaponDeactivateEvent" )
-
-	WaitFrame()
-
-	if ( IsValid( weapon ) && IsValid( weaponOwner ) && weapon == weaponOwner.GetActiveWeapon() )
-	{
-		if( weaponOwner.IsPlayer() )
-		{
-			entity modelEnt = weaponOwner.GetViewModelEntity()
-	 	}
-	}
 }
 
 void function OnWeaponDeactivate_titanweapon_arc_cannon_archon( entity weapon )
 {
 	weapon.StopWeaponSound("MegaTurret_Laser_ChargeUp_3P")
 }
-
-
 
 void function OnWeaponOwnerChanged_titanweapon_arc_cannon_archon( entity weapon, WeaponOwnerChangedParams changeParams )
 {
@@ -153,13 +133,7 @@ void function OnWeaponOwnerChanged_titanweapon_arc_cannon_archon( entity weapon,
 
 bool function OnWeaponChargeBegin_titanweapon_arc_cannon_archon( entity weapon )
 {
-	local stub = "this is here to suppress the untyped message.  This can go away when the .s. usage is removed from this file."
-	#if SERVER
-	//if ( weapon.HasMod( "fastpacitor_push_apart" ) )
-	//	weapon.GetWeaponOwner().StunMovementBegin( weapon.GetWeaponSettingFloat( eWeaponVar.charge_time ) )
-	#endif
 	weapon.EmitWeaponSound("MegaTurret_Laser_ChargeUp_3P")
-
 	return true
 }
 
@@ -174,7 +148,7 @@ var function OnWeaponPrimaryAttack_titanweapon_arc_cannon_archon( entity weapon,
 		return
 
 	local fireRate = weapon.GetWeaponInfoFileKeyField( "fire_rate" )
-	thread ArchonCannon_HideOrShowIdleEffect( weapon )
+	//thread ArchonCannon_HideOrShowIdleEffect( weapon )
 	int damageFlags = weapon.GetWeaponDamageFlags()
 
 	return FireArchonCannon( weapon, attackParams )
@@ -184,184 +158,42 @@ var function OnWeaponPrimaryAttack_titanweapon_arc_cannon_archon( entity weapon,
 var function OnWeaponNpcPrimaryAttack_titanweapon_arc_cannon_archon( entity weapon, WeaponPrimaryAttackParams attackParams )
 {
 	local fireRate = weapon.GetWeaponInfoFileKeyField( "fire_rate" )
-	thread ArchonCannon_HideOrShowIdleEffect( weapon )
+	//thread ArchonCannon_HideOrShowIdleEffect( weapon )
 
 	return FireArchonCannon( weapon, attackParams )
 }
 #endif // #if SERVER
 
-
-void function ArcCannonOnDamage( entity ent, var damageInfo )
+void function OnWeaponReadyToFire_titanweapon_arc_cannon_archon( entity weapon )
 {
-	vector pos = DamageInfo_GetDamagePosition( damageInfo )
-	entity attacker = DamageInfo_GetAttacker( damageInfo )
-	entity mainWeapon = attacker.GetActiveWeapon()
-
-	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
-		return
-
-	float damageMultiplier = DamageInfo_GetDamage( damageInfo ) / mainWeapon.GetWeaponSettingInt( eWeaponVar.damage_near_value_titanarmor )
-
-	if ( ent.IsPlayer() || ent.IsNPC() )
-	{
-		entity entToSlow = ent
-		entity soul = ent.GetTitanSoul()
-
-		if ( soul != null )
-			entToSlow = soul
-
-		if ( DamageInfo_GetDamage( damageInfo ) <= 0 )
-			return
-		//StatusEffect_AddTimed( entToSlow, eStatusEffect.move_slow, 0.5, 2.0, 1.0 )
-		//StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 2.0, 1.0 )
-
-		const ARC_TITAN_EMP_DURATION			= 0.35
-		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
-
-		StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.2*damageMultiplier, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
-
-		float staticFeedbackAmount = 0.05 //1/20 or 5%
-
-		if(IsValid(mainWeapon)){
-			if ( mainWeapon.HasMod( "fd_terminator" ) )
-				UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
-		}
-
-		if(mainWeapon.HasMod("static_feedback"))
-		{
-				if ( attacker.IsTitan() )
-				{
-						array<entity> weapons = []
-						weapons.append( attacker.GetOffhandWeapon( OFFHAND_RIGHT ))
-						weapons.append( attacker.GetOffhandWeapon( OFFHAND_ANTIRODEO ))
-						weapons.append( attacker.GetOffhandWeapon( OFFHAND_SPECIAL ))
-
-						foreach (weapon in weapons)
-						{
-							if( weapon.IsChargeWeapon() && !weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total ))
-							{
-								if ( weapon.GetWeaponChargeFraction() - staticFeedbackAmount * damageMultiplier < 0 )
-								{
-									weapon.SetWeaponChargeFraction(0)
-								}
-								else
-								{
-									weapon.SetWeaponChargeFraction(weapon.GetWeaponChargeFraction() - staticFeedbackAmount * damageMultiplier)
-								}
-							}
-							else
-							{
-								float ammoPortion = weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total ) * staticFeedbackAmount
-
-								if ( weapon.GetWeaponPrimaryClipCount() + ammoPortion * damageMultiplier > weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total ) )
-								{
-									weapon.SetWeaponPrimaryClipCount( weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total ) )
-								}
-								else
-								{
-									weapon.SetWeaponPrimaryClipCount( weapon.GetWeaponPrimaryClipCount() + ammoPortion * damageMultiplier)
-								}
-							}
-						}
-				}
-		}
-	}
-
-
-	#if SERVER
-	string tag = ""
-	asset effect
-
-	if ( ent.IsTitan() )
-	{
-		tag = "exp_torso_front"
-		effect = FX_EMP_BODY_TITAN
-	}
-	else if ( ChestFocusTarget( ent ) )
-	{
-		tag = "CHESTFOCUS"
-		effect = FX_EMP_BODY_HUMAN
-	}
-	else if ( IsAirDrone( ent ) )
-	{
-		tag = "HEADSHOT"
-		effect = FX_EMP_BODY_HUMAN
-	}
-	else if ( IsGunship( ent ) )
-	{
-		tag = "ORIGIN"
-		effect = FX_EMP_BODY_TITAN
-	}
-
-	if ( tag != "" )
-	{
-		float duration = 2.0
-		//thread EMP_FX( effect, ent, tag, duration )
-	}
-
-	if ( ent.IsTitan() )
-	{
-		if ( ent.IsPlayer() )
-		{
-		 	EmitSoundOnEntityOnlyToPlayer( ent, ent, "titan_energy_bulletimpact_3p_vs_1p" )
-			EmitSoundOnEntityExceptToPlayer( ent, ent, "titan_energy_bulletimpact_3p_vs_3p" )
-		}
-		else
-		{
-		 	EmitSoundOnEntity( ent, "titan_energy_bulletimpact_3p_vs_3p" )
-		}
-	}
-	else
-	{
-		if ( ent.IsPlayer() )
-		{
-		 	EmitSoundOnEntityOnlyToPlayer( ent, ent, "flesh_lavafog_deathzap_3p" )
-			EmitSoundOnEntityExceptToPlayer( ent, ent, "flesh_lavafog_deathzap_1p" )
-		}
-		else
-		{
-		 	EmitSoundOnEntity( ent, "flesh_lavafog_deathzap_1p" )
-		}
-	}
-	#endif
+	thread ArchonCannon_HideOrShowIdleEffect( weapon )
 }
 
-#if SERVER
-bool function ChestFocusTarget( entity ent )
+function DelayedArcCannonStart( entity weapon, entity weaponOwner )
 {
-	if ( IsSpectre( ent ) )
-		return true
-	if ( IsStalker( ent ) )
-		return true
-	if ( IsSuperSpectre( ent ) )
-		return true
-	if ( IsGrunt( ent ) )
-		return true
-	if ( IsPilot( ent ) )
-		return true
+	weapon.EndSignal( "WeaponDeactivateEvent" )
 
-	return false
+	WaitFrame()
+
+	if ( IsValid( weapon ) && IsValid( weaponOwner ) && weapon == weaponOwner.GetActiveWeapon() )
+	{
+		if( weaponOwner.IsPlayer() )
+		{
+			entity modelEnt = weaponOwner.GetViewModelEntity()
+	 	}
+	}
 }
-#endif // #if SERVER
 
 function FireArchonCannon( entity weapon, WeaponPrimaryAttackParams attackParams )
 {
 	local weaponScriptScope = weapon.GetScriptScope()
 	local baseCharge = GetWeaponChargeFrac( weapon ) // + GetOverchargeBonusChargeFraction()
-	local charge = clamp( baseCharge * ( 1 / GetArchonCannonChargeFraction( weapon ) ), 0.0, 1.0 )
+	local charge = clamp( baseCharge * ( 1 / ARCHON_CANNON_DAMAGE_CHARGE_RATIO ), 0.0, 1.0 )
 	float newVolume = GraphCapped( charge, 0.25, 1.0, 0.0, 1.0 )
 
 	weapon.EmitWeaponNpcSound( LOUD_WEAPON_AI_SOUND_RADIUS_MP, 0.2 )
 
-
-	if ( weapon.HasMod( "static_feedback" ))
-	{
-		weapon.PlayWeaponEffect( $"wpn_muzzleflash_arc_cannon_fp", $"wpn_muzzleflash_arc_cannon", "muzzle_flash" )
-	}
-	else{
-		weapon.PlayWeaponEffect( $"wpn_muzzleflash_arc_cannon_fp", $"wpn_muzzleflash_arc_cannon", "muzzle_flash" )
-	}
-
+	weapon.PlayWeaponEffect( $"wpn_muzzleflash_arc_cannon_fp", $"wpn_muzzleflash_arc_cannon", "muzzle_flash" )
 
 	weapon.EmitWeaponSound_1p3p( "weapon_electric_smoke_electrocute_titan_1p", "weapon_electric_smoke_electrocute_titan_3p")
 	weapon.EmitWeaponSound_1p3p( "weapon_batterygun_firestart_1p", "weapon_batterygun_fire_energydrained_3p")
@@ -380,14 +212,11 @@ function FireArchonCannon( entity weapon, WeaponPrimaryAttackParams attackParams
 	local muzzleOrigin = weapon.GetAttachmentOrigin( attachmentIndex )
 
 	table firstTargetInfo = GetFirstArcCannonTarget( weapon, attackParams )
-	//printt("THIS IS MY FIRST TARGET: " + firstTargetInfo.target)
 	if ( !IsValid( firstTargetInfo.target ) ){
 		FireArcNoTargets( weapon, attackParams, muzzleOrigin )
-		//printt("I FIRED WITH NO TARGETS")
 	}
 	else{
 		FireArcWithTargets( weapon, firstTargetInfo, attackParams, muzzleOrigin )
-		//printt("I FIRED WITH TARGETS YOU FUCK")
 	}
 	return 1
 }
@@ -423,9 +252,6 @@ table function GetFirstArcCannonTarget( entity weapon, WeaponPrimaryAttackParams
 	array<VisibleEntityInCone> results = FindVisibleEntitiesInCone( attackParams.pos, attackParams.dir, coneHeight, coneAngle, ignoredEntities, traceMask, flags, antilagPlayer )
 	foreach ( result in results )
 	{
-		//printt("I CAN SEE SHIT")
-		//print(result.ent)
-		//print(result.visibleHitbox)
 		entity visibleEnt = result.ent
 
 		if ( !IsValid( visibleEnt ) )
@@ -444,8 +270,6 @@ table function GetFirstArcCannonTarget( entity weapon, WeaponPrimaryAttackParams
 		firstTargetInfo.target = visibleEnt
 		firstTargetInfo.hitLocation = result.visiblePosition
 		firstTargetInfo.hitBox = result.visibleHitbox
-		//printt(visibleEnt)
-		//printt(firstTargetInfo.target)
 	}
 	//Creating a whiz-by sound.
 	weapon.FireWeaponBullet_Special( attackParams.pos, attackParams.dir, 1, 0, true, true, true, true, true, false, false )
@@ -704,7 +528,7 @@ function ZapTarget( zapInfo, target, beamStartPos, beamEndPos, chainNum = 1 )
 			}
 
 
-			local chargeRatio = GetArchonCannonChargeFraction( zapInfo.weapon )
+			local chargeRatio = ARCHON_CANNON_DAMAGE_CHARGE_RATIO
 			if  ( IsValid( zapInfo.weapon ) )
 			{
 				// use distance for damage if the weapon auto-fires
@@ -716,16 +540,14 @@ function ZapTarget( zapInfo, target, beamStartPos, beamEndPos, chainNum = 1 )
 
 				float dist = Distance( owner.GetOrigin(), target.GetOrigin() )
 				maxDamageAmount = GraphCapped( dist, farDist, nearDist, damageMin, damageMax )
-				float arcWeaponCharge = GraphCapped( zapInfo.chargeFrac, 0, chargeRatio/*0.85*/, 0, 1 )
+				float arcWeaponCharge = GraphCapped( zapInfo.chargeFrac, 0, chargeRatio, 0, 1 )
 				if ( owner.IsNPC() || weapon.GetWeaponClassName() == "mp_titanweapon_shock_shield")
 				{
 					damageAmount = maxDamageAmount
-					print("DAMAGE OUTPUT: " + damageAmount)
 				}
 				else
 				{
 					damageAmount = maxDamageAmount * arcWeaponCharge
-					print("DAMAGE OUTPUT: " + damageAmount)
 				}
 
 			}
@@ -745,7 +567,7 @@ function ZapTarget( zapInfo, target, beamStartPos, beamEndPos, chainNum = 1 )
 			{
 				float empDuration = GraphCapped( zapInfo.chargeFrac, 0, chargeRatio, ARCHON_CANNON_EMP_DURATION_MIN, ARCHON_CANNON_EMP_DURATION_MAX )
 
-				if ( target.IsPlayer() && target.IsTitan() && !hasFastPacitor && !noArcing )
+				/*if ( target.IsPlayer() && target.IsTitan() && !hasFastPacitor && !noArcing )
 				{
 					float empViewStrength = GraphCapped( zapInfo.chargeFrac, 0, chargeRatio, ARCHON_CANNON_SCREEN_EFFECTS_MIN, ARCHON_CANNON_SCREEN_EFFECTS_MAX )
 
@@ -759,7 +581,7 @@ function ZapTarget( zapInfo, target, beamStartPos, beamEndPos, chainNum = 1 )
 						StatusEffect_AddTimed( target, eStatusEffect.emp, empViewStrength, empDuration, ARCHON_CANNON_EMP_FADEOUT_DURATION )
 						EmitSoundOnEntityOnlyToPlayer( target, target, ARCHON_CANNON_PILOT_SCREEN_SFX )
 					}
-				}
+				}*/
 
 				// Do 3rd person effect on the body
 				entity weapon = expect entity( zapInfo.weapon )
@@ -933,8 +755,6 @@ array<entity> function GetArcCannonChainTargets( vector fromOrigin, entity fromT
 		if ( !results.contains( ent ) )
 			results.append( ent )
 	}
-
-	//printt( "NEARBY TARGETS VALID AND VISIBLE:", results.len() )
 	return results
 }
 #endif // SERVER
@@ -957,12 +777,13 @@ bool function IsEntANeutralMegaTurret_Archon( ent, int playerTeam )
 function ArchonCannon_HideOrShowIdleEffect( entity weapon )
 {
 	bool weaponOwnerIsPilot = IsPilot( weapon.GetWeaponOwner() )
-	weapon.EndSignal( ARCHON_CANNON_SIGNAL_DEACTIVATED )
+	weapon.EndSignal( ARC_CANNON_SIGNAL_DEACTIVATED )
 	if ( weaponOwnerIsPilot == false )
 	{
 		weapon.StopWeaponEffect( $"wpn_arc_cannon_electricity_fp", $"wpn_arc_cannon_electricity" )
-		//weapon.StopWeaponSound( "arc_cannon_charged_loop" )
+		weapon.StopWeaponSound( "arc_cannon_charged_loop" )
 	}
+	WaitFrame()
 
 	if ( !IsValid( weapon ) )
 		return
@@ -970,7 +791,7 @@ function ArchonCannon_HideOrShowIdleEffect( entity weapon )
 	entity weaponOwner = weapon.GetWeaponOwner()
 	//The weapon can be valid, but the player isn't a Titan during melee execute.
 	// JFS: threads with waits should just end on "OnDestroy"
-	if ( !IsValid( weaponOwner ) )
+	if ( !IsValid( weaponOwner ) || !IsValid( weapon ) )
 		return
 
 	if ( weapon != weaponOwner.GetActiveWeapon() )
@@ -978,13 +799,12 @@ function ArchonCannon_HideOrShowIdleEffect( entity weapon )
 
 	if ( weaponOwnerIsPilot == false )
 	{
-		if( IsValid( weapon ) )
-			weapon.PlayWeaponEffectNoCull( $"wpn_arc_cannon_electricity_fp", $"wpn_arc_cannon_electricity", "muzzle_flash" )
-		//weapon.EmitWeaponSound( "arc_cannon_charged_loop" )
+		weapon.PlayWeaponEffectNoCull( $"wpn_arc_cannon_electricity_fp", $"wpn_arc_cannon_electricity", "muzzle_flash" )
+		weapon.EmitWeaponSound( "arc_cannon_charged_loop" )
 	}
 	else
 	{
-		//weapon.EmitWeaponSound_1p3p( "Arc_Rifle_charged_Loop_1P", "Arc_Rifle_charged_Loop_3P" )
+		weapon.EmitWeaponSound_1p3p( "Arc_Rifle_charged_Loop_1P", "Arc_Rifle_charged_Loop_3P" )
 	}
 }
 
@@ -1101,21 +921,8 @@ function CreateClientArcBeam( weapon, endPos, lifeDuration, target )
 		lifeDuration = ARCHON_CANNON_BEAM_LIFETIME_BURN
 
 	wait( lifeDuration )
-
-	//if ( IsValid( weapon ) )
-		//weapon.StopWeaponEffect( beamEffect, $"" )
 }
 #endif // CLIENT
-
-function GetArchonCannonChargeFraction( weapon )
-{
-	if ( IsValid( weapon ) )
-	{
-		local chargeRatio = ARCHON_CANNON_DAMAGE_CHARGE_RATIO
-		return chargeRatio
-	}
-	return 0
-}
 
 function GetWeaponChargeFrac( weapon )
 {
@@ -1123,3 +930,231 @@ function GetWeaponChargeFrac( weapon )
 		return weapon.GetWeaponChargeFraction()
 	return 1.0
 }
+
+void function ArcCannonOnDamage( entity ent, var damageInfo )
+{
+	vector pos = DamageInfo_GetDamagePosition( damageInfo )
+	entity attacker = DamageInfo_GetAttacker( damageInfo )
+	entity weapon = attacker.GetActiveWeapon()
+
+	if ( !IsValid( attacker ))
+		return
+
+	if ( attacker.GetTeam() == ent.GetTeam() )
+		return
+
+	if ( ent.IsPlayer() || ent.IsNPC() )
+	{
+		entity entToSlow = ent
+		entity soul = ent.GetTitanSoul()
+
+		if ( soul != null )
+			entToSlow = soul
+
+		if ( DamageInfo_GetDamage( damageInfo ) <= 0 )
+			return
+
+		const ARC_TITAN_EMP_DURATION			= 0.85
+		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.85
+
+		float damageMultiplier = DamageInfo_GetDamage( damageInfo ) / weapon.GetWeaponSettingInt( eWeaponVar.damage_near_value_titanarmor )
+
+		float maxAmmoFrac = 0.05 //1/20 or 5%
+		float ammoFrac = maxAmmoFrac * damageMultiplier
+
+		StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.2 * damageMultiplier, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+
+		if( IsValid( weapon ) )
+		{
+			if ( weapon.HasMod( "fd_terminator" ) )
+				UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
+		}
+
+		if( weapon.HasMod( "static_feedback" ) )
+		{
+			if ( attacker.IsTitan() )
+			{
+				array<entity> weapons = []
+				weapons.append( attacker.GetOffhandWeapon( OFFHAND_RIGHT ))
+				weapons.append( attacker.GetOffhandWeapon( OFFHAND_ANTIRODEO ))
+				weapons.append( attacker.GetOffhandWeapon( OFFHAND_SPECIAL ))
+
+				foreach ( weapon in weapons )
+				{
+					if( weapon.IsChargeWeapon() && !weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total )) //CHARGE REFUNDING
+					{
+						if ( weapon.GetWeaponChargeFraction() - ammoFrac < 0 )
+						{
+							weapon.SetWeaponChargeFraction( 0 )
+						}
+						else
+						{
+							weapon.SetWeaponChargeFraction( weapon.GetWeaponChargeFraction() - ammoFrac )
+						}
+					}
+					else //AMMO REFUNDING
+					{
+						float ammoPortion = weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total ) * ammoFrac
+
+						if ( weapon.GetWeaponPrimaryClipCount() + ammoPortion > weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total ) )
+						{
+							weapon.SetWeaponPrimaryClipCount( weapon.GetWeaponSettingInt( eWeaponVar.ammo_default_total ) )
+						}
+						else
+						{
+							weapon.SetWeaponPrimaryClipCount( weapon.GetWeaponPrimaryClipCount() + ammoPortion )
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	#if SERVER
+	string tag = ""
+	asset effect
+
+	if ( ent.IsTitan() )
+	{
+		tag = "exp_torso_front"
+		effect = FX_EMP_BODY_TITAN
+	}
+	else if ( ChestFocusTarget( ent ) )
+	{
+		tag = "CHESTFOCUS"
+		effect = FX_EMP_BODY_HUMAN
+	}
+	else if ( IsAirDrone( ent ) )
+	{
+		tag = "HEADSHOT"
+		effect = FX_EMP_BODY_HUMAN
+	}
+	else if ( IsGunship( ent ) )
+	{
+		tag = "ORIGIN"
+		effect = FX_EMP_BODY_TITAN
+	}
+
+	if ( tag != "" )
+	{
+		float damageMultiplier = DamageInfo_GetDamage( damageInfo ) / weapon.GetWeaponSettingInt( eWeaponVar.damage_near_value_titanarmor )
+		float duration = 2.0 * damageMultiplier
+		thread EmpFXWithAi( effect, ent, tag, duration )
+	}
+
+	if ( ent.IsTitan() )
+	{
+		if ( ent.IsPlayer() )
+		{
+		 	EmitSoundOnEntityOnlyToPlayer( ent, ent, "titan_energy_bulletimpact_3p_vs_1p" )
+			EmitSoundOnEntityExceptToPlayer( ent, ent, "titan_energy_bulletimpact_3p_vs_3p" )
+		}
+		else
+		{
+		 	EmitSoundOnEntity( ent, "titan_energy_bulletimpact_3p_vs_3p" )
+		}
+	}
+	else
+	{
+		if ( ent.IsPlayer() )
+		{
+		 	EmitSoundOnEntityOnlyToPlayer( ent, ent, "flesh_lavafog_deathzap_3p" )
+			EmitSoundOnEntityExceptToPlayer( ent, ent, "flesh_lavafog_deathzap_1p" )
+		}
+		else
+		{
+		 	EmitSoundOnEntity( ent, "flesh_lavafog_deathzap_1p" )
+		}
+	}
+	#endif
+}
+
+#if SERVER
+function EmpFXWithAi( asset effect, entity ent, string tag, float duration )
+{
+	if ( !IsAlive( ent ) )
+		return
+
+	ent.Signal( "EMP_FX" )
+	ent.EndSignal( "OnDestroy" )
+	ent.EndSignal( "OnDeath" )
+	ent.EndSignal( "StartPhaseShift" )
+	ent.EndSignal( "EMP_FX" )
+
+	bool isPlayer = ent.IsPlayer()
+
+	int fxId = GetParticleSystemIndex( effect )
+	int attachId = ent.LookupAttachment( tag )
+
+	entity fxHandle = StartParticleEffectOnEntity_ReturnEntity( ent, fxId, FX_PATTACH_POINT_FOLLOW, attachId )
+	fxHandle.kv.VisibilityFlags = ENTITY_VISIBLE_TO_FRIENDLY | ENTITY_VISIBLE_TO_ENEMY
+	fxHandle.SetOwner( ent )
+
+	OnThreadEnd(
+		function() : ( fxHandle, ent )
+		{
+			if ( IsValid( fxHandle ) )
+			{
+				EffectStop( fxHandle )
+			}
+
+			if ( IsValid( ent ) )
+				StopSoundOnEntity( ent, "Titan_Blue_Electricity_Cloud" )
+		}
+	)
+
+	if ( !isPlayer )
+	{
+		EmitSoundOnEntity( ent, "Titan_Blue_Electricity_Cloud" )
+		EffectWake( fxHandle )
+		wait duration
+	}
+	else
+	{
+		EmitSoundOnEntityExceptToPlayer( ent, ent, "Titan_Blue_Electricity_Cloud" )
+
+		var endTime = Time() + duration
+		bool effectsActive = true
+		while( endTime > Time() )
+		{
+			if ( ent.IsPhaseShifted() )
+			{
+				if ( effectsActive )
+				{
+					effectsActive = false
+					if ( IsValid( fxHandle ) )
+						EffectSleep( fxHandle )
+
+					if ( IsValid( ent ) )
+						StopSoundOnEntity( ent, "Titan_Blue_Electricity_Cloud" )
+				}
+			}
+			else if ( effectsActive == false )
+			{
+				EffectWake( fxHandle )
+				EmitSoundOnEntityExceptToPlayer( ent, ent, "Titan_Blue_Electricity_Cloud" )
+				effectsActive = true
+			}
+
+			WaitFrame()
+		}
+	}
+}
+
+bool function ChestFocusTarget( entity ent )
+{
+	if ( IsSpectre( ent ) )
+		return true
+	if ( IsStalker( ent ) )
+		return true
+	if ( IsSuperSpectre( ent ) )
+		return true
+	if ( IsGrunt( ent ) )
+		return true
+	if ( IsPilot( ent ) )
+		return true
+
+	return false
+}
+#endif // #if SERVER

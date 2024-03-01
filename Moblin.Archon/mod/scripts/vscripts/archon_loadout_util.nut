@@ -85,6 +85,11 @@ void function SetArchonTitanLoadout( entity titan, TitanLoadoutDef loadout  )
 			mods.append( "fd_terminator" )
 			weapon.SetMods( mods )
 
+			weapon = titan.GetOffhandWeapon(OFFHAND_EQUIPMENT)
+			mods = weapon.GetMods()
+			mods.append( "fd_terminator" )
+			weapon.SetMods( mods )
+
 			//Rank 5: Shield Upgrade
 			float titanShieldHealth = GetTitanSoulShieldHealth( soul )
 			soul.SetShieldHealthMax( int( titanShieldHealth * 1.5 ) )

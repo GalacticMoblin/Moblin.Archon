@@ -118,6 +118,8 @@ WeaponData
 	"trigger_snipercam"   							"0"
 	"allow_headshots" 								"0"
 
+	"activitymodifier" 								"mp_titanweapon_vortex_shield"
+
 	// Spread
 	"spread_stand_hip"  							"7"
 	"spread_stand_ads"   							"7"
@@ -211,10 +213,6 @@ WeaponData
 
 	// Crosshair
 	"red_crosshair_range" 							"1500"
-
-
-	// Third Person Animation
-	"activitymodifier"								"mp_titanweapon_vortex_shield" // makes titan use vortex shield's blocking animation
 
 	Mods
 	{

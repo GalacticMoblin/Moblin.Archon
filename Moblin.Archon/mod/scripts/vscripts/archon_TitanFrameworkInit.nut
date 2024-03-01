@@ -2,15 +2,18 @@ global function ArchonUIInit
 void function ArchonUIInit()
 {
 	#if ARCHON_HAS_TITANFRAMEWORK
+		#if UI
+			//AddTitanBriefingMilesAudio( "meet_#DEFAULT_TITAN_1", "bt_hotdrop_turbo" )
+		#endif
 	//========================================//-NAMES AND STATS-//========================================//
 		ModdedTitanData Archon
 		Archon.Name = "#DEFAULT_TITAN_1"
 		Archon.icon = $"archon/menu/archon_icon_medium"
 		Archon.Description = "#MP_TITAN_LOADOUT_DESC_ARCHON"
-		Archon.BaseSetFile = "titan_atlas_stickybomb"
+		Archon.BaseSetFile = "titan_atlas_ion_prime"
 		Archon.BaseName = "ion"
-		Archon.startsAsPrime = true
-		Archon.passiveDisplayNameOverride = "#TITAN_OS_ARCHON_NAME"
+		Archon.altChassisType = frameworkAltChassisMethod.NONE
+		Archon.passiveDisplayNameOverride = "#TITAN_ARCHON_PASSIVE_TITLE"
 		Archon.difficulty = 2
 		Archon.speedStat = 2
 		Archon.damageStat = 3
@@ -26,9 +29,9 @@ void function ArchonUIInit()
 		//========================================//-WEAPONS-//========================================//
 		ModdedTitanWeaponAbilityData ArcCannon
 		ArcCannon.custom = true
-		ArcCannon.displayName = "#WPN_TITAN_ARC_CANNON"
+		ArcCannon.displayName = "#WPN_TITAN_ARCHON_ARC_CANNON"
 		ArcCannon.weaponName = "mp_titanweapon_archon_arc_cannon"
-		ArcCannon.description = "#WPN_TITAN_ARC_CANNON_LONGDESC"
+		ArcCannon.description = "#WPN_TITAN_ARCHON_ARC_CANNON_LONGDESC"
 		ArcCannon.image = $"archon/hud/arc_cannon"
 		Archon.Primary = ArcCannon
 

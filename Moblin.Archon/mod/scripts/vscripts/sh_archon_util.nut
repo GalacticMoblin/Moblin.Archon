@@ -11,7 +11,7 @@ global function ConeDamageTethersException
 #endif
 
 const float TERMINATOR_EFFECT_LENGTH = 20.0
-const int FD_TERMINATOR_DAMAGE_MAX = 8000
+const int FD_TERMINATOR_DAMAGE_MAX = 7500
 
 struct
 {
@@ -23,6 +23,7 @@ void function ArchonPrecache()
 	#if SERVER
 	RegisterWeaponDamageSources(
 		{
+			mp_titanweapon_archon_arc_cannon = "#WPN_TITAN_ARCHON_ARC_CANNON",
 			mp_titanweapon_tesla_node = "#WPN_TITAN_TESLA_NODE",
 			mp_titanweapon_charge_ball = "#WPN_TITAN_CHARGE_BALL",
 			mp_titanweapon_shock_shield = "#WPN_TITAN_SHOCK_SHIELD",
@@ -39,15 +40,45 @@ void function ArchonPrecache()
 	Archon_Loadout_Util()
 	#if SERVER
         GameModeRulesRegisterTimerCreditException( eDamageSourceId.mp_titancore_storm_core )
+				AddCallback_OnPilotBecomesTitan( OnArchonChange )
+				AddCallback_OnTitanBecomesPilot( OnArchonChange )
 	#endif
 	#if CLIENT
 		AddTitanCockpitManagedRUI( Archon_CreateTerminatorBar, Archon_DestroyTerminatorBar, Archon_ShouldCreateTerminatorBar, RUI_DRAW_COCKPIT ) //RUI_DRAW_HUD
 	#endif
 }
 
+/*#if UI
+void function ArchonBriefingVideo()
+{
+	AddTitanBriefingMilesAudio( "meet_#DEFAULT_TITAN_1", "Titan_Video_Ion" )
+}
+#endif*/
+
+#if SERVER
+void function OnArchonChange( entity pilot, entity npc_titan )
+{
+	if( npc_titan.ai.titanSpawnLoadout.name == "#DEFAULT_TITAN_1" )
+	{
+		pilot.SetPlayerNetFloat( "coreMeterModifier", 0 )
+		pilot.Signal("StopTerminator")
+
+		//Gotta make this a seperate function at some point
+		entity ChargeBall = npc_titan.GetOffhandWeapon( OFFHAND_RIGHT )
+		entity ShockShield = npc_titan.GetOffhandWeapon( OFFHAND_SPECIAL )
+
+		array<entity> weapons = npc_titan.GetMainWeapons()
+		weapons.append( ChargeBall )
+		weapons.append( ShockShield )
+
+		RemoveTerminator( pilot, weapons )
+	}
+}
+#endif
+
 void function ArchonNetworkVars()
 {
-	AddCallback_OnRegisteringCustomNetworkVars( RegisterArchonNetworkVars )
+	//AddCallback_OnRegisteringCustomNetworkVars( RegisterArchonNetworkVars )
 }
 
 #if SERVER
@@ -146,6 +177,7 @@ void function PlayerGotTerminator( entity player )
 	array<entity> weapons = player.GetMainWeapons()
 	weapons.append( ChargeBall )
 	weapons.append( ShockShield )
+
 	foreach ( entity weapon in weapons )
 	{
 		foreach ( string mod in GetWeaponBurnMods( weapon.GetWeaponClassName() ) )
@@ -164,12 +196,16 @@ void function PlayerGotTerminator( entity player )
 		// needed to display amped weapon time left
 		weapon.SetScriptFlags0( weapon.GetScriptFlags0() | WEAPONFLAG_AMPED )
 		weapon.SetScriptTime0( Time() + TERMINATOR_EFFECT_LENGTH )
-		print("Flags "+ weapon.GetScriptFlags0())
 	}
 
 	wait TERMINATOR_EFFECT_LENGTH
 
 	// note: weapons may have been destroyed or picked up by other people by this point, so need to verify this
+	RemoveTerminator( player, weapons )
+}
+
+void function RemoveTerminator( entity pilot, array<entity> weapons )
+{
 	foreach ( entity weapon in weapons )
 	{
 		if ( !IsValid( weapon ) )
@@ -177,7 +213,7 @@ void function PlayerGotTerminator( entity player )
 
 		foreach ( string mod in GetWeaponBurnMods( weapon.GetWeaponClassName() ) )
 			weapon.RemoveMod( mod )
-			player.SetPlayerNetFloat( "terminatorMeter", 0.0)
+			pilot.SetPlayerNetFloat( "coreMeterModifier", 0.0)
 
 		weapon.SetScriptFlags0( weapon.GetScriptFlags0() & ~WEAPONFLAG_AMPED )
 	}
@@ -187,7 +223,7 @@ void function RegisterArchonNetworkVars()
 {
 	if (!IsLobby())
 	{
-		RegisterNetworkedVariable( "terminatorMeter", SNDC_PLAYER_GLOBAL, SNVT_FLOAT_RANGE_OVER_TIME, 0.0, 0.0, 1.0 )
+		RegisterNetworkedVariable( "coreMeterModifier", SNDC_PLAYER_GLOBAL, SNVT_FLOAT_RANGE_OVER_TIME, 0.0, 0.0, 1.0 )
 	}
 }
 
@@ -198,7 +234,7 @@ var function Archon_CreateTerminatorBar()
 
 	file.archonTerminatorRui = CreateFixedTitanCockpitRui( $"ui/scorch_hotstreak_bar.rpak" )
 
-	RuiTrackFloat( file.archonTerminatorRui, "coreMeterMultiplier", GetLocalViewPlayer(), RUI_TRACK_SCRIPT_NETWORK_VAR, GetNetworkedVariableIndex( "terminatorMeter" ) )
+	RuiTrackFloat( file.archonTerminatorRui, "coreMeterMultiplier", GetLocalViewPlayer(), RUI_TRACK_SCRIPT_NETWORK_VAR, GetNetworkedVariableIndex( "coreMeterModifier" ) )
 
 	return file.archonTerminatorRui
 }
@@ -231,16 +267,16 @@ void function UpdateArchonTerminatorMeter( entity attacker, float damage )
 		return
 
 	if(!attacker.GetMainWeapons()[0].HasMod("burn_mod_fd_terminator_active")){
-		float baseValue = attacker.GetPlayerNetFloat( "terminatorMeter" )
+		float baseValue = attacker.GetPlayerNetFloat( "coreMeterModifier" )
 		float newValue = damage / FD_TERMINATOR_DAMAGE_MAX * 0.5
 		float combinedValue = baseValue + newValue
 		if ( baseValue + newValue >= 0.5 )
 			combinedValue = 1.0
 
-		attacker.SetPlayerNetFloat( "terminatorMeter", combinedValue )
+		attacker.SetPlayerNetFloat( "coreMeterModifier", combinedValue )
 	}
 
-	if(attacker.GetPlayerNetFloat( "terminatorMeter" ) >= 1.0 && !attacker.GetMainWeapons()[0].HasMod("burn_mod_fd_terminator_active"))
+	if(attacker.GetPlayerNetFloat( "coreMeterModifier" ) >= 1.0 && !attacker.GetMainWeapons()[0].HasMod("burn_mod_fd_terminator_active"))
 		thread PlayerGotTerminator( attacker )
 }
 

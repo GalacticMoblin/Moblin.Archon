@@ -13,6 +13,10 @@ global function OnProjectileCollision_titancore_storm_core
 const FX_EMP_FIELD						= $"P_xo_emp_field"
 const FX_EMP_GLOW             = $"P_titan_core_atlas_charge"
 
+const STORM_BALL_SPEED = 1000.0
+const PLAYER_SPEED_MULTIPLIER = 0.30
+const STORM_BALL_SMOKE_LIFETIME = 5.0
+
 struct {
 	table<entity, float> sonarExpiryTimes
 } file
@@ -22,6 +26,11 @@ void function StormCore_Init()
 	PrecacheWeapon( "mp_titancore_storm_core" )
 	PrecacheParticleSystem( FX_EMP_FIELD )
 	PrecacheParticleSystem( FX_EMP_GLOW )
+
+	#if SERVER
+		AddDamageCallbackSourceID( eDamageSourceId.mp_titancore_storm_core, StormCoreOnDamage )
+		FW_AddHarvesterDamageSourceModifier( eDamageSourceId.mp_titancore_storm_core, 0.67 )
+	#endif
 }
 
 void function OnWeaponActivate_titancore_storm_core( entity weapon )
@@ -38,10 +47,10 @@ bool function OnAbilityCharge_Storm_Core( entity weapon )
 		entity soul = owner.GetTitanSoul()
 		if ( soul == null )
 			soul = owner
-		StatusEffect_AddTimed( owner, eStatusEffect.move_slow, 0.6, chargeTime, 0 )
-		StatusEffect_AddTimed( owner, eStatusEffect.dodge_speed_slow, 0.6, chargeTime, 0 )
-    StatusEffect_AddTimed( owner, eStatusEffect.emp, 0.05, chargeTime*1.5, 0.35 )
-		//StatusEffect_AddTimed( owner, eStatusEffect.damageAmpFXOnly, 1.0, chargeTime, 0 )
+		StatusEffect_AddTimed( soul, eStatusEffect.move_slow, 0.6, chargeTime, 0 )
+		StatusEffect_AddTimed( soul, eStatusEffect.dodge_speed_slow, 0.6, chargeTime, 0 )
+		StatusEffect_AddTimed( soul, eStatusEffect.damageAmpFXOnly, 1.0, chargeTime, 0 )
+		StatusEffect_AddTimed( owner, eStatusEffect.emp, 0.05, chargeTime*1.5, 0.35 )
 
 		if ( owner.IsPlayer() )
 			owner.SetTitanDisembarkEnabled( false )
@@ -99,13 +108,13 @@ void function FireStormBall( entity weapon, vector pos, vector dir, bool shouldP
 {
 	entity owner = weapon.GetWeaponOwner()
 
-	float speed = 1000.0
+	float speed = STORM_BALL_SPEED
 
 	if ( owner.IsPlayer() )
 	{
 		vector myVelocity = owner.GetVelocity()
 
-		float mySpeed = Length( myVelocity )
+		float mySpeed = Length( myVelocity ) * PLAYER_SPEED_MULTIPLIER
 
 		myVelocity = Normalize( myVelocity )
 
@@ -113,9 +122,7 @@ void function FireStormBall( entity weapon, vector pos, vector dir, bool shouldP
 
 		dotProduct = max( 0, dotProduct )
 
-		mySpeed = mySpeed*0.30
-
-		speed = speed + ( mySpeed*dotProduct )
+		speed = speed + ( mySpeed * dotProduct )
 	}
 
 	int team = TEAM_UNASSIGNED
@@ -125,15 +132,16 @@ void function FireStormBall( entity weapon, vector pos, vector dir, bool shouldP
 	int flags = DF_EXPLOSION | DF_STOPS_TITAN_REGEN | DF_DOOM_FATALITY | DF_SKIP_DAMAGE_PROT
 
 	entity bolt = null
-	if( weapon.HasMod("fd_rolling_thunder") ){
+	if( weapon.HasMod( "fd_rolling_thunder" ) )
+	{
 		vector angularVelocity = Vector( 0, 0, 0 )
 
 		vector bulletVec = ApplyVectorSpread( dir, owner.GetAttackSpreadAngle() * 2 )
-		print("BULLET VECTOR: " + bulletVec)
 
 		bolt = weapon.FireWeaponGrenade( pos, bulletVec, angularVelocity, 0.0 , damageTypes.arcCannon | DF_ELECTRICAL, damageTypes.arcCannon | DF_EXPLOSION, shouldPredict, true, true )
 	}
-	else{
+	else
+	{
 		bolt = weapon.FireWeaponBolt( pos, dir, speed, damageTypes.arcCannon | DF_ELECTRICAL, damageTypes.arcCannon | DF_EXPLOSION, shouldPredict, 0 )
 	}
 	if ( bolt != null )
@@ -148,19 +156,18 @@ void function FireStormBall( entity weapon, vector pos, vector dir, bool shouldP
 
 		bolt.SetProjectileLifetime( lifetime )
 
-
 		#if SERVER
 			if ( IsValid( bolt ) )
 			{
 				PlayFXOnEntity( FX_EMP_FIELD, bolt, "", <0, 0, -21.0> )
-				PlayFXOnEntity( FX_EMP_FIELD, bolt, "", <0, 0, -20.0> )
+				PlayFXOnEntity( FX_EMP_FIELD, bolt, "", <0, 0, -21.0> )
 				PlayFXOnEntity( FX_EMP_FIELD, bolt, "", <0, 0, -22.0> )
-				PlayFXOnEntity( FX_EMP_GLOW, bolt)
+				PlayFXOnEntity( FX_EMP_GLOW, bolt )
 				EmitSoundOnEntity( bolt, "EMP_Titan_Electrical_Field" )
 				EmitSoundOnEntity( bolt, "Wpn_LaserTripMine_LaserLoop" )
 
-
 				vector origin = owner.OffsetPositionFromView( <0, 0, 0>, <25, -25, 15> )
+
 				#if SERVER
 					AddDamageCallbackSourceID( eDamageSourceId.mp_titancore_storm_core, StormCore_DamagedTarget )
 				#endif
@@ -179,7 +186,7 @@ void function FireStormBall( entity weapon, vector pos, vector dir, bool shouldP
 void function OnProjectileCollision_titancore_storm_core( entity projectile, vector pos, vector normal, entity hitEnt, int hitbox, bool isCritical )
 {
 	#if SERVER
-	if(IsValid(projectile) && IsValid(projectile.GetOwner()))
+	if( IsValid( projectile ) && IsValid( projectile.GetOwner() ) )
 	{
 		if( projectile.ProjectileGetMods().contains( "fd_rolling_thunder" ) )
 		{
@@ -207,8 +214,8 @@ void function OnProjectileCollision_titancore_storm_core( entity projectile, vec
 #if SERVER
 void function UpdateStormCoreField( entity owner, entity bolt, entity weapon, vector origin, float lifetime )
 {
-    bolt.EndSignal( "OnDestroy" )
-    float endTime = Time() + lifetime
+  bolt.EndSignal( "OnDestroy" )
+  float endTime = Time() + lifetime
 
 	while ( Time() < endTime )
 	{
@@ -216,13 +223,12 @@ void function UpdateStormCoreField( entity owner, entity bolt, entity weapon, ve
 		origin = bolt.GetOrigin()
 		StormCoreFieldDamage( weapon, bolt, origin )
 	}
-
 }
 
 void function UpdateStormCoreSmoke( entity owner, entity bolt, entity weapon, vector origin, float lifetime )
 {
-    bolt.EndSignal( "OnDestroy" )
-    float endTime = Time() + lifetime
+  bolt.EndSignal( "OnDestroy" )
+  float endTime = Time() + lifetime
 
 	while ( Time() < endTime )
 	{
@@ -236,7 +242,7 @@ void function UpdateStormCoreSmoke( entity owner, entity bolt, entity weapon, ve
 function StormCoreFieldDamage( entity weapon, entity bolt, vector origin )
 {
 
-	int flags = DF_EXPLOSION | DF_STOPS_TITAN_REGEN | DF_DOOM_FATALITY | DF_SKIP_DAMAGE_PROT
+	int flags = DF_EXPLOSION | DF_STOPS_TITAN_REGEN | DF_DOOM_FATALITY | DF_SKIP_DAMAGE_PROT | DF_GIB
 
 	// sonar things
 	if ( !IsValid( weapon ) ) // i guess if you die you dont get more sonar, too bad!
@@ -256,9 +262,12 @@ function StormCoreFieldDamage( entity weapon, entity bolt, vector origin )
 			if ( TraceLineSimple(origin, enemy.GetCenter(), enemy) == 1.0 )
 			{
 				float oldExpiryTime = 0
+
 				if ( enemy in file.sonarExpiryTimes )
-					oldExpiryTime = file.sonarExpiryTimes[enemy]
-				file.sonarExpiryTimes[enemy] <- Time() + 5.0 // this 5.0 is how long the sonar should stay
+					oldExpiryTime = file.sonarExpiryTimes[ enemy ]
+
+				file.sonarExpiryTimes[ enemy ] <- Time() + STORM_BALL_SMOKE_LIFETIME //Length of the sonar
+
 				if ( Time() > oldExpiryTime )
 					thread StormCoreSonar_Think( enemy, weapon.GetOwner().GetTeam(), weapon.GetOwner(), origin )
 
@@ -324,7 +333,7 @@ void function StormCoreSmokescreen( entity bolt, asset fx, entity owner )
 
 	SmokescreenStruct smokescreen
 	smokescreen.smokescreenFX = fx
-	smokescreen.lifetime = 5.0
+	smokescreen.lifetime = STORM_BALL_SMOKE_LIFETIME
 	smokescreen.ownerTeam = owner.GetTeam()
 	smokescreen.damageSource = eDamageSourceId.mp_titancore_storm_core
 	smokescreen.deploySound1p = ""
@@ -344,5 +353,28 @@ void function StormCoreSmokescreen( entity bolt, asset fx, entity owner )
 	smokescreen.fxOffsets = [ <0.0, 0.0, 0.0> ]
 
 	Smokescreen( smokescreen )
+}
+#endif
+
+#if SERVER // CBaseCombatCharacter only exists on server-side
+void function StormCoreOnDamage( entity ent, var damageInfo )
+{
+	const ARC_TITAN_EMP_DURATION			= 0.35
+	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
+
+	StatusEffect_AddTimed( ent, eStatusEffect.emp, 0.1, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+
+	entity attacker = DamageInfo_GetAttacker( damageInfo )
+
+	if ( !IsValid( attacker ) || attacker.GetTeam() == ent.GetTeam() )
+		return
+
+	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
+
+	if( IsValid( weapon ) )
+	{
+		if ( weapon.HasMod( "fd_terminator" ) )
+			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
+	}
 }
 #endif

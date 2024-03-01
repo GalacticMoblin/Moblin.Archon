@@ -1,10 +1,10 @@
 WeaponData
 {
 	// General
-	"printname"   									"#WPN_TITAN_ARC_CANNON"
-	"shortprintname"								"#WPN_TITAN_ARC_CANNON_SHORT"
-	"description" 									"#WPN_TITAN_ARC_CANNON_DESC"
-	"longdesc"										"#WPN_TITAN_ARC_CANNON_LONGDESC"
+	"printname"   									"#WPN_TITAN_ARCHON_ARC_CANNON"
+	"shortprintname"								"#WPN_TITAN_ARCHON_ARC_CANNON_SHORT"
+	"description" 									"#WPN_TITAN_ARCHON_ARC_CANNON_DESC"
+	"longdesc"										"#WPN_TITAN_ARCHON_ARC_CANNON_LONGDESC"
 	"weaponClass" 									"titan"
 	"fire_mode"   									"full-auto"
 	"pickup_hold_prompt"  							"Hold [USE] [WEAPONNAME]"
@@ -15,9 +15,8 @@ WeaponData
 	"hud_icon"										"archon/hud/arc_cannon"
 
 	// Models
-	"viewmodel"   									"models/weapons/titan_arc_rifle/atpov_titan_arc_rifle.mdl"
-	"playermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
-	"holstermodel" 									"models/weapons/titan_arc_rifle/w_titan_arc_rifle.mdl"
+	"viewmodel"   									"models/weapons/titan_archon_arc_rifle/atpov_titan_archon_arc_rifle.mdl"
+	"playermodel" 									"models/weapons/titan_archon_arc_rifle/w_titan_archon_arc_rifle.mdl"
 	"projectilemodel" 									"models/dev/empty_model.mdl"
 	"anim_prefix" 									"ar2"
 
@@ -28,6 +27,7 @@ WeaponData
 	"OnWeaponChargeEnd"							"OnWeaponChargeEnd_titanweapon_arc_cannon_archon"
 	"OnWeaponPrimaryAttack"							"OnWeaponPrimaryAttack_titanweapon_arc_cannon_archon"
 	"OnWeaponNpcPrimaryAttack"						"OnWeaponNpcPrimaryAttack_titanweapon_arc_cannon_archon"
+	"OnWeaponReadyToFire"						"OnWeaponReadyToFire_titanweapon_arc_cannon_archon"
 	"impulse_force"   								"1000"
 
 	// Effects
@@ -38,8 +38,6 @@ WeaponData
 	"impact_effect_table" 							"exp_arc_cannon"
 	"impact_sound" 							"MegaTurret_Laser_Fire_3P"
 	"adjust_to_gun_barrel"							"1"
-	"fx_muzzle_flash_view"							"P_wpn_mflash_arcball_FP"
-	"fx_muzzle_flash_world"							"wpn_arc_cannon_electricity"
 	"fx_muzzle_flash_attach"						"muzzle_flash"
 
 	// Damage - When Used by Players
@@ -112,6 +110,8 @@ WeaponData
 	"charge_effect_1p"								"wpn_arc_cannon_charge_fp"
 	"charge_effect_3p"								"wpn_arc_cannon_charge"
 	"charge_effect_attachment"						"muzzle_flash"
+
+	"activitymodifier"						"mp_titanweapon_particle_accelerator"
 
 	// Spread
 	"spread_stand_hip"  							"0"
@@ -250,10 +250,6 @@ WeaponData
 
 	"is_burn_mod"									"0"
 
-
-	// Third Person Animation
-	"activitymodifier"								"mp_titanweapon_particle_accelerator" // makes titan use splitter rifle's standing animation
-
 	Mods
 	{
 		chain_reaction //Increases Chains by +2
@@ -279,6 +275,14 @@ WeaponData
 			"is_burn_mod"									"1"
 			"charge_time" 									"*0.67" //33% Charge Time Bonus
 			"hud_icon"										"archon/hud/arc_cannon_terminator"
+		}
+		arc_devotion
+		{
+			"fire_rate_max_time_speedup"   "10.0"
+			"fire_rate"   									"1.5"//"1"
+			"fire_rate_max"   									"20.0"
+
+			"charge_time" 									"0.01"//"3.7"
 		}
 	}
 

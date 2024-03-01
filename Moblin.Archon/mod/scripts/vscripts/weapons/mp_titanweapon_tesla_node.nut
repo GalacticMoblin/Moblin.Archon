@@ -1,6 +1,5 @@
 untyped
 
-
 global function TeslaNode_Init
 
 global function OnWeaponPrimaryAttack_titanweapon_tesla_node
@@ -57,9 +56,11 @@ void function TeslaNode_Init()
 	#if SERVER
 		file.ArcPylonsIdx = CreateScriptManagedEntArray()
 		AddDamageCallbackSourceID( eDamageSourceId.mp_titanweapon_tesla_node, ArcPylon_DamagedPlayerOrNPC )
+		FW_AddHarvesterDamageSourceModifier( eDamageSourceId.mp_titanweapon_tesla_node, 0.5 )
 	#endif
 }
-    void function OnWeaponOwnerChanged_titanweapon_tesla_node( entity weapon, WeaponOwnerChangedParams changeParams )
+
+void function OnWeaponOwnerChanged_titanweapon_tesla_node( entity weapon, WeaponOwnerChangedParams changeParams )
 {
 	#if SERVER
 	entity owner = weapon.GetWeaponOwner()
@@ -155,14 +156,14 @@ function DeployArcPylon( entity projectile )
 	entity tower = CreatePropScript( LASER_TRIP_MODEL, origin, angles, SOLID_VPHYSICS )
 	tower.kv.collisionGroup = TRACE_COLLISION_GROUP_BLOCK_WEAPONS
 	//tower.EnableAttackableByAI( 20, 0, AI_AP_FLAG_NONE )
-	SetTargetName( tower, "Laser Tripwire Base" )
-	tower.SetMaxHealth( 500000 )
-	tower.SetHealth( 500000 )
-	tower.SetTakeDamageType( DAMAGE_NO )
+	SetTargetName( tower, "Tesla Coil Base" )
+	tower.SetMaxHealth( 1250 )
+	tower.SetHealth( 1250 )
+	tower.SetTakeDamageType( DAMAGE_YES )
 	tower.SetDamageNotifications( true )
 	tower.SetDeathNotifications( true )
-	tower.SetArmorType( ARMOR_TYPE_HEAVY )
-	tower.SetTitle( "Laser Tripwire" )
+	tower.SetArmorType( ARMOR_TYPE_NORMAL )
+	tower.SetTitle( "Tesla Coil" )
 	tower.EndSignal( "OnDestroy" )
 	EmitSoundOnEntity( tower, "Wpn_LaserTripMine_Land" )
 	tower.e.noOwnerFriendlyFire = true
@@ -179,8 +180,8 @@ function DeployArcPylon( entity projectile )
 	SetTeam( tower, team )
 	SetObjectCanBeMeleed( tower, false )
 	SetVisibleEntitiesInConeQueriableEnabled( tower, true )
-    //AddEntityCallback_OnDamaged( tower, OnArcPylonBodyDamaged )
-	SetCustomSmartAmmoTarget( tower, false )
+	AddEntityCallback_OnDamaged( tower, OnArcPylonBodyDamaged )
+	SetCustomSmartAmmoTarget( tower, true )
 	thread TrapDestroyOnRoundEnd( owner, tower )
 
 	entity pylon = CreateEntity( "script_mover" )
@@ -192,7 +193,7 @@ function DeployArcPylon( entity projectile )
 	pylon.kv.rendercolor = "0 0 255"
 	pylon.kv.solid = SOLID_HITBOXES
 	pylon.kv.SpawnAsPhysicsMover = 0
-	SetTargetName( pylon, "Laser Tripwire" )
+	SetTargetName( pylon, "Tesla Coil" )
 	pylon.SetOrigin( origin )
 	pylon.SetAngles( angles )
 	pylon.SetOwner( owner.GetTitanSoul() )
@@ -200,14 +201,13 @@ function DeployArcPylon( entity projectile )
 	pylon.SetMaxHealth( ARC_PYLON_HEALTH )
 	pylon.SetHealth( ARC_PYLON_HEALTH )
 	pylon.SetTakeDamageType( DAMAGE_YES )
-	pylon.SetDamageNotifications( false )
+	pylon.SetDamageNotifications( true )
 	pylon.SetDeathNotifications( true )
-	pylon.SetArmorType( ARMOR_TYPE_HEAVY )
+	pylon.SetArmorType( ARMOR_TYPE_NORMAL )
 	SetVisibleEntitiesInConeQueriableEnabled( pylon, true )
 	SetTeam( pylon, team )
 	pylon.NotSolid()
 	pylon.Hide()
-
 
 	DispatchSpawn( pylon )
 
@@ -228,9 +228,6 @@ function DeployArcPylon( entity projectile )
 	}
 
 	vector pylonOrigin = pylon.GetOrigin()
-
-	//print("PREDEP ----- Pylon: " + pylon + " Projectile: " + projectile)
-
 
 	OnThreadEnd(
 	function() : ( projectile, inflictor, tower, pylon, noSpawnIdx, team, pylonOrigin )
@@ -285,7 +282,6 @@ function DeployArcPylon( entity projectile )
 
   string attachment = ""
 	int attachID = pylon.LookupAttachment( attachment )
-	//print("DEPLOYED ----- Pylon: " + pylon + " Projectile: " + projectile)
   thread CreateArcPylonField( pylon, projectile, pylonOrigin, attachment, attachID, FX_EMP_FIELD, FX_NODE_RING, ARC_PYLON_LIFETIME )
 
 	PlayLoopFXOnEntity( LASER_TRIP_FX_ALL, pylon )
@@ -299,16 +295,6 @@ function DeployArcPylon( entity projectile )
 }
 #endif //SERVER
 
-
-#if SERVER
-void function StopArcSoundAtPosition( entity pylon, vector position )
-{
-	pylon.WaitSignal( "OnDestroy" )
-	StopSoundAtPosition( position, "Wpn_LaserTripMine_LaserLoop" )
-}
-#endif
-
-/*
 void function OnArcPylonBodyDamaged( entity pylonBody, var damageInfo )
 {
 	entity attacker = DamageInfo_GetAttacker( damageInfo )
@@ -318,10 +304,10 @@ void function OnArcPylonBodyDamaged( entity pylonBody, var damageInfo )
 	{
 		if ( attacker.IsPlayer() )
 		{
-			//attacker.NotifyDidDamage( pylonBody, DamageInfo_GetHitBox( damageInfo ), DamageInfo_GetDamagePosition( damageInfo ), DamageInfo_GetCustomDamageType( damageInfo ), DamageInfo_GetDamage( damageInfo ), DamageInfo_GetDamageFlags( damageInfo ), DamageInfo_GetHitGroup( damageInfo ), DamageInfo_GetWeapon( damageInfo ), DamageInfo_GetDistFromAttackOrigin( damageInfo ) )
+			attacker.NotifyDidDamage( pylonBody, DamageInfo_GetHitBox( damageInfo ), DamageInfo_GetDamagePosition( damageInfo ), DamageInfo_GetCustomDamageType( damageInfo ), DamageInfo_GetDamage( damageInfo ), DamageInfo_GetDamageFlags( damageInfo ), DamageInfo_GetHitGroup( damageInfo ), DamageInfo_GetWeapon( damageInfo ), DamageInfo_GetDistFromAttackOrigin( damageInfo ) )
 		}
 	}
-}*/
+}
 
 #if SERVER
 void function ArcPylon_DamagedPlayerOrNPC( entity ent, var damageInfo )
@@ -342,12 +328,8 @@ void function ArcPylon_DamagedPlayerOrNPC( entity ent, var damageInfo )
 	if ( !IsValid( titan ) )
 		return
 
-	/*local className = ent.GetClassName()
-	if ( ent.IsProjectile() || className == "npc_turret_sentry" )
-	{
-		DamageInfo_SetDamage( damageInfo, 0 ) // Won't damage things hurt by AoE damage like Satchels and Tethers
-		return
-	}*/
+	if ( ent.GetTeam() == titan.GetTeam() )
+		DamageInfo_SetDamage( damageInfo, 0 )
 
 	if ( DamageInfo_GetDamage( damageInfo ) <= 0 )
 		return
@@ -384,13 +366,10 @@ void function ArcPylon_DamagedPlayerOrNPC( entity ent, var damageInfo )
 #if SERVER
 function CreateArcPylonField(entity pylon, entity weapon, vector origin, string attachment, attachID, asset effectNamePrimary, asset effectNameSecondary, float duration)
 {
-	//print("---PYLON DEPLOYED---")
-	if(IsValid(pylon))
+	if( IsValid( pylon ) )
 	{
-		//print("-----PYLON VALIDATED-----")
-		if(IsValid(weapon))
+		if( IsValid( weapon ) )
 		{
-			//print("---------WEAPON VALIDATED---------")
 			entity weaponOwner = weapon.GetOwner()
 			EmitSoundOnEntity( pylon, "EMP_Titan_Electrical_Field" )
 
@@ -398,10 +377,12 @@ function CreateArcPylonField(entity pylon, entity weapon, vector origin, string 
 
 			entity particleSystem = CreateEntity( "info_particle_system" )
 			particleSystem.kv.start_active = 1
+
 			if ( weaponOwner.IsPlayer() )
 				particleSystem.kv.VisibilityFlags = (ENTITY_VISIBLE_TO_FRIENDLY | ENTITY_VISIBLE_TO_ENEMY)	// everyone but owner
 			else
 				particleSystem.kv.VisibilityFlags = ENTITY_VISIBLE_TO_EVERYONE
+
 			particleSystem.SetValueForEffectNameKey( effectNamePrimary )
 			particleSystem.SetOwner( pylon )
 			particleSystem.SetOrigin( origin )
@@ -410,10 +391,12 @@ function CreateArcPylonField(entity pylon, entity weapon, vector origin, string 
 
 			entity particleSystem2 = CreateEntity( "info_particle_system" )
 			particleSystem2.kv.start_active = 1
+
 			if ( weaponOwner.IsPlayer() )
 				particleSystem2.kv.VisibilityFlags = (ENTITY_VISIBLE_TO_FRIENDLY | ENTITY_VISIBLE_TO_ENEMY)	// everyone but owner
 			else
 				particleSystem2.kv.VisibilityFlags = ENTITY_VISIBLE_TO_EVERYONE
+
 			particleSystem2.SetValueForEffectNameKey( effectNameSecondary )
 			particleSystem2.SetOwner( pylon )
 			particleSystem2.SetOrigin( origin )
@@ -452,18 +435,15 @@ function CreateArcPylonField(entity pylon, entity weapon, vector origin, string 
 
 			waitthread UpdateArcPylonField(weaponOwner, pylon, weapon, origin, duration)
 
-			//print("PREVAL ------------ " + weapon)
 			if ( IsValid( weapon ) )
 				weapon.Destroy()
-			//print("VALIDATED? ------------ " + weapon)
-
 
 		    pylon.Destroy()
 		}
 		else
 		{
 			pylon.Destroy()
-			//print("PYLON DESTROYEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+
 		}
 	}
 }
@@ -496,53 +476,5 @@ function ArcPylonFieldDamage( entity owner, entity pylon, vector origin )
         0,					                    // explosionForce
         DF_ELECTRICAL | DF_STOPS_TITAN_REGEN,	// scriptDamageFlags
         eDamageSourceId.mp_titanweapon_tesla_node )			// scriptDamageSourceIdentifier
-}
-
-void function OnArcPylonField_DamagedEntity( entity target, var damageInfo )
-{
-
-	if ( !IsAlive( target ) )
-		return
-
-	entity titan = DamageInfo_GetAttacker( damageInfo )
-	float outputDamage = DamageInfo_GetDamage( damageInfo )
-
-	//print("TESLA DAMAGE: " + outputDamage)
-
-	if ( !IsValid( titan ) )
-		return
-
-	local className = target.GetClassName()
-	if ( target.IsProjectile() || className == "npc_turret_sentry" )
-	{
-		DamageInfo_SetDamage( damageInfo, 0 ) // Won't damage things hurt by AoE damage like Satchels and Tethers
-		return
-	}
-
-	if ( DamageInfo_GetDamage( damageInfo ) <= 0 )
-		return
-
-	if ( DamageInfo_GetCustomDamageType( damageInfo ) & DF_DOOMED_HEALTH_LOSS )
-		return
-
-	float slowMultiplier = GraphCapped( outputDamage, 0, DAMAGE_AGAINST_TITANS, DAMAGE_AGAINST_TITANS / 2, DAMAGE_AGAINST_TITANS )
-
-	StatusEffect_AddTimed( target, eStatusEffect.move_slow, 0.25, 0.01, 0.25 )
-
-	const ARC_TITAN_SCREEN_EFFECTS 			= 0.085
-	const ARC_TITAN_EMP_DURATION			= 0.35
-	const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
-
-	local attachID 	= titan.LookupAttachment( "" )
-	local origin 	= titan.GetAttachmentOrigin( attachID )
-	local distSqr 	= Distance( origin, target.GetOrigin() )
-
-	local minDist 	= ARC_TITAN_EMP_FIELD_INNER_RADIUS_SQR
-	local maxDist 	= ARC_TITAN_EMP_FIELD_RADIUS_SQR
-	local empFxHigh = ARC_TITAN_SCREEN_EFFECTS
-	local empFxLow 	= ( ARC_TITAN_SCREEN_EFFECTS * 0.6 )
-	float screenEffectAmplitude = GraphCapped( distSqr, ARC_TITAN_EMP_FIELD_INNER_RADIUS, ARC_TITAN_EMP_FIELD_RADIUS, empFxHigh, empFxLow )
-
-	StatusEffect_AddTimed( target, eStatusEffect.emp, screenEffectAmplitude, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 }
 #endif

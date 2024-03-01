@@ -46,8 +46,6 @@ var function OnWeaponPrimaryAttack_weapon_titanweapon_charge_ball( entity weapon
 			return
 	#endif
 
-	var fireMode = weapon.GetWeaponInfoFileKeyField( "fire_mode" )
-
 	vector attackPos = attackParams.pos
 	vector attackDir = attackParams.dir
 
@@ -61,16 +59,23 @@ var function OnWeaponPrimaryAttack_weapon_titanweapon_charge_ball( entity weapon
 	if (charge == 1.0)
 	{
   	extraBallAmount++
-  	if (weapon.HasMod("thylord_module") ) { extraBallAmount++ }
+  	if ( weapon.HasMod("thylord_module") )
+		{
+			extraBallAmount++
+			angleMultiplier = 1.12
+		}
 	}
 
 	for (int i = -extraBallAmount ; i < extraBallAmount+1 ; i++)
 	{
 		float finalMultiplier = angleMultiplier*i
+
 		int damageSplitter = extraBallAmount+1
 		float zapDamage = 300.0 / damageSplitter
+
 		if( weapon.HasMod( "fd_balance" ) )
 			float zapDamage = zapDamage * 0.9
+
 		FireArcBall( weapon, attackPos, attackDir + rightVec * angleoffset*finalMultiplier, shouldPredict, zapDamage )
 		//Single = 300 per, Triple = 150 per, Thylord = 100 per
 		//270, 135, 90 in FD
@@ -126,7 +131,9 @@ void function ChargeBallOnDamage( entity ent, var damageInfo )
 
 	// all checks passed, it's now safe to get attacker's weapon
 	entity weapon = attacker.GetOffhandWeapon(OFFHAND_RIGHT)
-	if( IsValid( weapon ) ){
+
+	if( IsValid( weapon ) )
+	{
 		if ( weapon.HasMod( "fd_terminator" ) )
 			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
 	}

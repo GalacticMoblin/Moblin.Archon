@@ -1,7 +1,8 @@
 {
     "Preload":
     {
-        "archon.rpak":true
+        "archon.rpak": true,
+	"arc_cannon.rpak": false
     },
     "Aliases":
     {
@@ -9,6 +10,6 @@
     },
     "Postload":
     {
-        
+	"arc_cannon.rpak": "common.rpak"
     }
 }

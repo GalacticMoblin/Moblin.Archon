@@ -15,7 +15,7 @@ WeaponData
 
 	"damage_type" 									"burn"
 
-  "damage_flags"									"DF_ELECTRICAL | DF_STOPS_TITAN_REGEN | DF_DOOM_FATALITY | DF_SKIP_DAMAGE_PROT"
+  "damage_flags"									"DF_ELECTRICAL | DF_STOPS_TITAN_REGEN | DF_DOOM_FATALITY | DF_SKIP_DAMAGE_PROT | DF_GIB"
 
 	// Ammo
 	"ammo_stockpile_max"							"200"
@@ -40,8 +40,8 @@ WeaponData
   "OnWeaponActivate"					"OnWeaponActivate_titancore_storm_core"
   "OnProjectileCollision"								"OnProjectileCollision_titancore_storm_core"
 
-	"offhand_holster_primary"						"1" // make titan holster weapon just like laser core
-	"aimassist_disable_hipfire_humansonly"			"1"
+	"offhand_holster_primary"				"1" // make titan holster weapon just like laser core
+	"aimassist_disable_hipfire_humansonly"				"1"
 	"aimassist_disable_ads_humansonly"				"1"
 
 	//"sustained_discharge_duration"				"5.0" // core duration
@@ -56,7 +56,7 @@ WeaponData
 	"charge_require_input"							"0"
 	"passive"										"PAS_FUSION_CORE" //Core Screen FX
 
-  "charge_allow_melee"                            "0"
+  "charge_allow_melee"				"0"
 
   "ads_fov_zoomfrac_start"						"0.0"
 	"ads_fov_zoomfrac_end"							"1.0"
@@ -172,5 +172,9 @@ WeaponData
       "grenade_roll_vel_frac_per_second"				"0"
       "projectile_launch_speed"						"1000"
     }
+    fd_terminator
+		{
+			//Used for Aegis modes only
+		}
 	}
 }

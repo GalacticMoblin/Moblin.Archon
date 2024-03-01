@@ -438,6 +438,9 @@ void function ShockShieldOnDamage( entity ent, var damageInfo )
 	entity attacker = DamageInfo_GetAttacker( damageInfo )
 	vector origin = DamageInfo_GetDamagePosition( damageInfo )
 
+	if ( ent.GetTeam() == attacker.GetTeam() )
+		return
+	printt("I AM DAMAGING")
 	if ( ent.IsPlayer() || ent.IsNPC() )
 	{
 		entity entToSlow = ent
@@ -452,46 +455,17 @@ void function ShockShieldOnDamage( entity ent, var damageInfo )
 		const ARC_TITAN_EMP_DURATION			= 0.35
 		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
 
-
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.move_slow, 0.5, 1.0, 1.0 )
 		StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 1.0, 1.0 )
-		StatusEffect_AddTimed( ent, eStatusEffect.emp, 1.0, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
+		StatusEffect_AddTimed( entToSlow, eStatusEffect.emp, 1.0, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
 	}
 
-	entity mainWeapon = attacker.GetOffhandWeapon( OFFHAND_LEFT )
+	entity weapon = attacker.GetOffhandWeapon( OFFHAND_LEFT )
 
-	if(IsValid(mainWeapon)){
-		if ( mainWeapon.HasMod( "fd_terminator" ) )
-			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
-	}
-
-	if ( false )//ent.IsPlayer() || ent.IsNPC() )
+	if( IsValid( weapon ) )
 	{
-		entity entToSlow = ent
-		entity soul = ent.GetTitanSoul()
-
-		if ( soul != null )
-			entToSlow = soul
-
-		entity weapon = attacker.GetOffhandWeapon(OFFHAND_SPECIAL)
-
-		if (!IsValid(entToSlow))
-			return
-		StatusEffect_AddTimed( entToSlow, eStatusEffect.move_slow, 0.5, 1.0, 1.0 )
-		StatusEffect_AddTimed( entToSlow, eStatusEffect.dodge_speed_slow, 0.5, 1.0, 1.0 )
-
-		const ARC_TITAN_EMP_DURATION			= 0.35
-		const ARC_TITAN_EMP_FADEOUT_DURATION	= 0.35
-
-		StatusEffect_AddTimed( entToSlow, eStatusEffect.emp, 0.25, ARC_TITAN_EMP_DURATION, ARC_TITAN_EMP_FADEOUT_DURATION )
-
-
-		//print("ENEMY: " + ent)
-		//print("USER: " + attacker)
-
-
-
-
+		if ( weapon.HasMod( "fd_terminator" ) )
+			UpdateArchonTerminatorMeter( attacker, DamageInfo_GetDamage( damageInfo ) )
 	}
 }
 
