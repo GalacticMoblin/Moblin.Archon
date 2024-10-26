@@ -14,6 +14,7 @@ void function ArchonUIInit()
 		Archon.BaseName = "ion"
 		Archon.altChassisType = frameworkAltChassisMethod.NONE
 		Archon.passiveDisplayNameOverride = "#TITAN_ARCHON_PASSIVE_TITLE"
+		Archon.titanReadyMessageOverride = "#HUD_ARCHON_READY"
 		Archon.difficulty = 2
 		Archon.speedStat = 2
 		Archon.damageStat = 3
