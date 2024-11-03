@@ -41,6 +41,8 @@ _Programmer, Writing Support_
 ## TRANSLATORS
 ### Daurik_
 _Russian Translation_
+### akinasu666
+_Japanese Translation_
 
 ## COMMUNITY CONTRIBUTORS
 _DBmaoha, NachosChipeados_
