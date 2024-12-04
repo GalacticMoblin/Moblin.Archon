@@ -24,27 +24,26 @@ void function Archon_CreateDependencyDialog( string mod, string dependency, stri
     DialogData dialogData
     dialogData.header = Localize("#MISSING_DEPENDENCY_HEADER")
 
-    array<string> mods = NSGetModNames()
-    // mod is installed but disabled
-    if ( mods.contains( dependency ) && !NSIsModEnabled( dependency ) )
-    {
-        dialogData.message = Localize( "#MISSING_DEPENDENCY_BODY_DISABLED", mod, dependency )
-        dialogData.forceChoice = true
-        dialogData.image = $"ui/menu/common/dialog_error"
+    array<ModInfo> infos = NSGetModInformation( dependency )
 
-	      AddDialogButton( dialogData, Localize("#ENABLE_MOD", dependency), Archon_EnableMod )
-        AddDialogButton( dialogData, Localize("#DISABLE_MOD", mod), Archon_DisableMod )
-        AddDialogFooter( dialogData, "#A_BUTTON_SELECT" )
-    }
-    else
-    {
-        dialogData.message = Localize( "#MISSING_DEPENDENCY_BODY_INSTALL", mod, dependency, url )
-        dialogData.forceChoice = true
-        dialogData.image = $"ui/menu/common/dialog_error"
+    //Mod not installed
+    dialogData.message = Localize( "#MISSING_DEPENDENCY_BODY_INSTALL", mod, dependency, url )
 
-	      AddDialogButton( dialogData, "#OPEN_THUNDERSTORE", Archon_InstallMod )
-        AddDialogButton( dialogData, Localize("#DISABLE_MOD", mod), Archon_DisableMod )
-        AddDialogFooter( dialogData, "#A_BUTTON_SELECT" )
+	AddDialogButton( dialogData, "#OPEN_THUNDERSTORE", Archon_InstallMod )
+    AddDialogButton( dialogData, Localize("#DISABLE_MOD", mod), Archon_DisableMod )
+    AddDialogFooter( dialogData, "#A_BUTTON_SELECT" )
+	AddDialogFooter( dialogData, "#B_BUTTON_BACK" )
+    foreach ( ModInfo modInfo in infos )
+    {
+        if ( modInfo.name == dependency ){//Mod disabled
+            dialogData.message = Localize( "#MISSING_DEPENDENCY_BODY_DISABLED", mod, dependency )
+
+	        AddDialogButton( dialogData, Localize("#ENABLE_MOD", dependency), Archon_EnableMod )
+            AddDialogButton( dialogData, Localize("#DISABLE_MOD", mod), Archon_DisableMod )
+            AddDialogFooter( dialogData, "#A_BUTTON_SELECT" )
+	        AddDialogFooter( dialogData, "#B_BUTTON_BACK" )
+            break
+        }
     }
 
 	OpenDialog( dialogData )
