@@ -1,6 +1,7 @@
 # REQUIRED BY SERVER AND CLIENT
 <p align="center"> <img src="https://user-images.githubusercontent.com/100473309/226972415-062a043a-b899-4538-aaa4-cc10dfb6cfaf.png" width="300" height="300">
-**Implements the Archon Titan based off of cut content.**
+
+  **Implements the Archon Titan based off of cut content.**
 
 ## Activation
 At the bottom of the Titan Loadout page, press Custom Loadouts, press Create New Loadout and open it, press Select Titan, select Archon.
