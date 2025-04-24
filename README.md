@@ -1,7 +1,6 @@
 # REQUIRED BY SERVER AND CLIENT
 <p align="center"> <img src="https://user-images.githubusercontent.com/100473309/226972415-062a043a-b899-4538-aaa4-cc10dfb6cfaf.png" width="300" height="300">
 
-
 **Implements the Archon Titan based off of cut content.**
 
 ## Activation
@@ -24,29 +23,15 @@ At the bottom of the Titan Loadout page, press Custom Loadouts, press Create New
 **Core: Storm Core** <img src="https://github.com/GalacticMoblin/Moblin.Archon/assets/100473309/1a26fda4-b385-494f-9752-93acdbf675bb" width="50" height="50">
 - Fires a massive ball of electricity that discharges on impact.
 
-## CONTRIBUTORS
-### GalacticMoblin 
-_Programmer, Playtester, Gameplay Designer, UI Designer, Writer_
-### Hurbski
-_Playtester, UI Designer, Concept Artist, Writer_
-### Dinorush
-_Programmer_
-### EXRILL
-_Custom Particles, Audio Support_
-### The Peepeepoopoo man
-_Programming Support, Framework Developer_
-### Spoon
-_Programmer, Writing Support_
+## Contributors
+GalacticMoblin - Programmer, Playtester, Gameplay Designer, UI Designer, Writer.
+Hurbski - Playtester, UI Designer, Concept Artist, Writer.
+Dinorush - Programmer.
+EXRILL - Custom Particles, Audio Support.
+The Peepeepoopoo man - Programming Support, Framework Developer.
+Spoon - Programmer, Writing Support.
+DBmaoha - PR Contributor.
 
-## TRANSLATORS
-### Daurik_
-_Russian Translation_
-### akinasu666
-_Japanese Translation_
-
-## COMMUNITY CONTRIBUTORS
-_DBmaoha, NachosChipeados_
-
-### *Special Thanks to the entire RePak Team, MDLShit Team and TitanFramework Team.*
+*Special Thanks to the entire RePak Team, MDLShit Team and TitanFramework Team.*
 
 *Thanks to everyone who helped with fixes and giving this a try.*

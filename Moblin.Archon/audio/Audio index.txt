@@ -1,2 +1,0 @@
-bt_hotdrop_turbo = Stormcore_1p
-bt_hotdrop_turbo_upgraded = Stormcore_3p
