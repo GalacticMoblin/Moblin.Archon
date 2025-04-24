@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"name": "Moblin.Archon",
+			"path": "."
+		},
+		{
+			"name": "Dinorush.Brute4",
+			"path": "../../../Dinorush-DinorushBrute4-1.8.8/mods/Dinorush.Brute4"
+		},
+		{
+			"name": "Hurb.Havoc",
+			"path": "../../../Hurb-Havoc-0.5.5/mods/Hurb.Havoc"
+		},
+		{
+			"name": "The_Peepeepoopoo_man-Titanframework-2.4.2",
+			"path": "../../../../../R2Experimental/packages/The_Peepeepoopoo_man-Titanframework-2.4.2"
+		},
+		{
+			"name": "peepee.Chimera",
+			"path": "../../../The_Peepeepoopoo_man-Chimera-1.4.1/mods/peepee.Chimera"
+		},
+		{
+			"path": "../../../../../../../../../DOWNLOADS/TheAvaliEngineer-Armory-0.0.0/TF-2-Armory/mods/TheAvaliEngineer.TAEsArmory"
+		}
+	],
+	"settings": {}
+}

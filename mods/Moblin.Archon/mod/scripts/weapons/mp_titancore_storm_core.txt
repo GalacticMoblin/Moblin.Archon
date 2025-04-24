@@ -1,0 +1,180 @@
+WeaponData
+{
+  "printname"										"#TITANCORE_STORM"
+  "shortprintname"								"#TITANCORE_STORM_SHORT"
+  "description"									"#TITANCORE_STORM_DESC"
+  "longdesc"										"#TITANCORE_STORM_DESC"
+
+	"menu_icon"										"archon/hud/storm_core"
+	"hud_icon"										"archon/hud/storm_core"
+
+	// General
+	"weaponClass" 									"titan"
+	"weaponType"									"titan_core"
+	"fire_mode"   									"offhand"
+
+	"damage_type" 									"burn"
+
+  "damage_flags"									"DF_ELECTRICAL | DF_STOPS_TITAN_REGEN | DF_DOOM_FATALITY | DF_SKIP_DAMAGE_PROT | DF_GIB"
+
+	// Ammo
+	"ammo_stockpile_max"							"200"
+	"ammo_clip_size"   								"200"
+	"ammo_default_total"							"200"
+
+	// Behavior
+	"core_build_time"								"150"
+	"chargeup_time"									"0.85"
+	"core_duration"									"0.45"
+
+	"readymessage"									"#HUD_CORE_ONLINE_ATLAS_ARC"
+	"readyhint"										"#HUD_CORE_ONLINE_ATLAS_ARC_HINT"
+
+	"dialog_core_online"							"flamewavecoreOnline"
+	"dialog_core_activated"							"flamewavecoreActivated"
+
+	"OnWeaponPrimaryAttack"							"OnWeaponPrimaryAttack_titancore_storm_core"
+	"OnWeaponChargeBegin"							"OnAbilityCharge_Storm_Core"
+	"OnWeaponChargeEnd"								"OnAbilityChargeEnd_Storm_Core"
+	"OnWeaponAttemptOffhandSwitch"					"CheckCoreAvailable"
+  "OnWeaponActivate"					"OnWeaponActivate_titancore_storm_core"
+  "OnProjectileCollision"								"OnProjectileCollision_titancore_storm_core"
+
+	"offhand_holster_primary"				"1" // make titan holster weapon just like laser core
+	"aimassist_disable_hipfire_humansonly"				"1"
+	"aimassist_disable_ads_humansonly"				"1"
+
+	//"sustained_discharge_duration"				"5.0" // core duration
+	//"sustained_discharge_pulse_frequency"			"0.5"
+	//"sustained_discharge_require_input"			"0"
+
+	// Charge settings
+	"charge_time" 									"0.75" // chargeup time
+	"charge_cooldown_time"							"0.5"
+	"charge_cooldown_delay"   						"1.0"
+	"charge_end_forces_fire"  						"1"
+	"charge_require_input"							"0"
+	"passive"										"PAS_FUSION_CORE" //Core Screen FX
+
+  "charge_allow_melee"				"0"
+
+  "ads_fov_zoomfrac_start"						"0.0"
+	"ads_fov_zoomfrac_end"							"1.0"
+  "zoom_fov"										"50"
+  //"attack_button_presses_ads"						"1"
+
+	"proficiency_poor_additional_rest"				"10"
+	"proficiency_average_additional_rest"			"8"
+	"proficiency_good_additional_rest"				"6"
+	"proficiency_very_good_additional_rest"			"0"
+
+	"npc_rest_time_between_bursts_min"				"16"
+	"npc_rest_time_between_bursts_max"				"16"
+
+	// Models
+  "viewmodel"   									"models//weapons/empty_handed/atpov_laser_cannon.mdl"
+	"playermodel" 									"models/weapons/empty_handed/w_empty_handed_titan.mdl"
+	"projectilemodel" 								"models/dev/empty_model.mdl"
+
+  "projectile_trail_effect_0" 					"P_wpn_arcball_trail"
+	"impact_effect_table" 							"exp_arc_ball"
+	"vortex_impact_sound_1p"						"vortex_shield_deflect_amped"
+	"vortex_impact_sound_3p"						"vortex_shield_deflect_amped"
+
+  "projectile_inherit_owner_velocity_scale"		"0.0"
+
+	"projectile_adjust_to_gun_barrel"				"1"
+	"show_grenade_indicator" 						"0"
+
+  "vortex_absorb_effect"							"P_impact_lstar_default"
+	"vortex_absorb_effect_third_person"				"P_impact_lstar_default"
+  "vortex_refire_behavior"  						""
+	"vortex_drain"									"1.0" //Vortex should ignore this core
+
+  "projectile_ignores_vortex"						"1"
+
+  "critical_hit"									"0"
+  "holster_time"									".45"
+
+	// TEMP: SCRIPT WAVE SETTINGS
+	"wave_max_count"								"15"
+	"wave_step_dist"								"120.0"
+	"charge_wave_max_count"							"15"
+	"charge_wave_step_dist"							"120.0"
+
+	//"special_3p_attack_anim" 						"1"
+
+  "grenade_bounce_vel_frac_shallow"				"0.0"
+  "grenade_bounce_vel_frac_sharp"					"0.0"
+  "grenade_bounce_vel_frac_along_normal"			"0.0"
+  "grenade_bounce_randomness"						"0.0"
+  "grenade_bounce_extra_vertical_randomness"		"0.0"
+  "grenade_roll_vel_frac_per_second"				"0.0"
+  "projectile_launch_speed"						"1"
+
+	MP_BASE
+	{
+		"damage_near_value"   							"4500"
+		"damage_far_value"								"4500"
+		"damage_near_value_titanarmor"					"1500"
+		"damage_far_value_titanarmor"					"1500"
+    "explosion_damage"								"400"
+		"explosion_damage_heavy_armor"					"1000"
+		"explosionradius" 								"450"
+    "explosion_inner_radius" 								"400"
+
+		"npc_damage_near_value_titanarmor"				"<KEEP_DEFAULT>"
+		"npc_damage_far_value_titanarmor"				"<KEEP_DEFAULT>"
+
+		"enable_highlight_networking_on_creation"		"<KEEP_DEFAULT>"
+	}
+
+	SP_BASE
+	{
+		"damage_near_value"   							"300"
+		"damage_far_value"								"300"
+		"damage_near_value_titanarmor"					"1000"
+		"damage_far_value_titanarmor"					"1000"
+    "explosion_damage"								"400"
+		"explosion_damage_heavy_armor"					"1500"
+		"explosionradius" 								"400"
+    "explosion_inner_radius" 								"400"
+
+		"npc_damage_near_value_titanarmor"				"3000"
+		"npc_damage_far_value_titanarmor"				"3000"
+
+		"enable_highlight_networking_on_creation"		"1"
+	}
+
+	// NPC
+	"npc_use_check_type"							"ground_clear"
+	"npc_vortex_block"								"0"
+	"npc_min_range"   								"0"
+	"npc_max_range"   								"1700"
+
+
+	// Third Person Animation
+	"activitymodifier"								"mp_titancore_laser_cannon" // makes titan use laser core's standing animation
+
+	Mods
+	{
+		bring_the_thunder
+		{
+      //spawns a cloud of electric smoke on impact
+		}
+    fd_rolling_thunder
+    {
+      "grenade_bounce_vel_frac_shallow"				"0.75"
+      "grenade_bounce_vel_frac_sharp"					"0.7"
+      "grenade_bounce_vel_frac_along_normal"			"0.8"
+      "grenade_bounce_randomness"						"0"
+      "grenade_bounce_extra_vertical_randomness"		"0"
+      "grenade_roll_vel_frac_per_second"				"0"
+      "projectile_launch_speed"						"1000"
+    }
+    fd_terminator
+		{
+			//Used for Aegis modes only
+		}
+	}
+}
