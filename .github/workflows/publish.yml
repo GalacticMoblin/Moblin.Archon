@@ -3,13 +3,6 @@ name: Publish package
 on:
   release:
     types: [published] # run when a new release is published
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'version to be used instead of a detected release'
-        default: ''
-        type: string
-        required: true
     
 env:
   name: ${{github.event.repository.name}} # Edit this if the package name differs from the repo name
@@ -35,9 +28,28 @@ jobs:
     needs: verify
     steps:
       - uses: actions/checkout@v4
+
       - name: Create Folders
         run: |
           mkdir -p Moblin.Archon && cp -R mods/ icon.png LICENSE manifest.json README.md Moblin.Archon/
+
+      - name: Get clean version
+        run: |
+          echo cleanVersion=$(echo ${{github.ref_name}} | sed s/v//g) >> $GITHUB_ENV
+
+      - uses: vimtor/action-zip@v1
+        name: zip rebalanced
+        with:
+          files: ./Moblin.Archon
+          dest: ./Moblin.Archon_v${{ env.cleanVersion }}.zip
+            
+      - name: Attach the mod to the release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./Moblin.Archon_v${{ env.cleanVersion }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload Thunderstore Package
         uses: GreenTF/upload-thunderstore-package@v3.1
         with:
@@ -54,6 +66,6 @@ jobs:
           # Thunderstore API token
           token: ${{ secrets.TS_KEY }} 
           # Directory to wrap the contents of the repo in
-          wrap: mods/${{ github.repository_owner }}.${{ env.name }} # This will wrap your Author.ModName folder in a mods/ folder before publishing
-          deps: "northstar-Northstar-1.30.1 The_Peepeepoopoo_man-Titanframework-2.4.3" # <------------- Uncomment this line to add dependencies to your mod, each sparated by a space
-          categories: "mods Server-side Client-side" # <----------------------------- Add more categories as needed, separated by spaces
+          file: ./Moblin.Archon_v${{ env.cleanVersion }}.zip
+          deps: northstar-Northstar-1.30.1 The_Peepeepoopoo_man-Titanframework-2.4.3 # <------------- Uncomment this line to add dependencies to your mod, each sparated by a space
+          categories: Mods Server-side Client-side # <----------------------------- Add more categories as needed, separated by spaces
