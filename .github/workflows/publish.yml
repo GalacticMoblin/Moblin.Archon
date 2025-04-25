@@ -36,7 +36,7 @@ jobs:
 
       - name: Create Folders
         run: |
-          mkdir -p Moblin.Archon && cp -R mods/ icon.png LICENSE manifest.json README.md Moblin.Archon/
+          mkdir -p Moblin.Archon && cp -R mods/ icon.png LICENSE manifest.json README.md CHANGELOG.md Moblin.Archon/
 
       - name: Get clean version
         run: |
