@@ -26,7 +26,7 @@ jobs:
         run: |
           if [[ "$(grep -Po "\d+\.\d+\.\d+" $(find ./mods/Moblin.Archon -name mod.json))" != "${{ env.cleanVersion }}" ]]; then
             echo "::debug::${{env.cleanVersion}}"
-            echo "::debug::$(cat $(find ./mods/Moblin.Archon -name mod.json ))"
+            echo "::debug::$(cat $(find ./ -name mod.json ))"
             echo "::error::Version in mod.json does not match tag version"
             exit 1
           fi
@@ -35,6 +35,9 @@ jobs:
     needs: verify
     steps:
       - uses: actions/checkout@v4
+      - name: Create Folders
+        run: |
+          mkdir -p Moblin.Archon && cp -R mods/ icon.png LICENSE manifest.json README.md Moblin.Archon/
       - name: Upload Thunderstore Package
         uses: GreenTF/upload-thunderstore-package@v3.1
         with:
