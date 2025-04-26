@@ -76,4 +76,4 @@ jobs:
           categories: |
             Mods 
             Server-side 
-            Client-side # <----------------------------- Add more categories as needed, separated by spaces
+            Client-side
