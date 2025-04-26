@@ -61,7 +61,7 @@ jobs:
           community: northstar
           # Name of the team to publish the mod under
           # This should be modified if your github username is different than your team name on Thunderstore
-          namespace: "GalacticMoblin" # <------ DOUBLE CHECK THIS
+          namespace: GalacticMoblin # <------ DOUBLE CHECK THIS
           # Name of the package
           name: MoblinArchon # This can be modified if the package name differs from the repo name
           # Package version to publish
