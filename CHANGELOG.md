@@ -8,7 +8,8 @@
 - Added FX to the `Arc Cannon` firing animation.
 
 **Bug Fixes**
-- Fixed Archon's Body Camo not being applied properly.
+- Fixed error on startup with dependency check. 
+- Fixed Archon's Body Camo not being applied properly. (Requires remaking loadout, sorry)
 - Stopped `Bring the Thunder` applying visual distortion to the attacker's team.
 - Fixed the `Tesla Node` projectile being able to be locked onto by the Smart Pistol after it disappears.
 - Fixed the `Tesla Node` projectile being left behind after being destroyed through damage.
