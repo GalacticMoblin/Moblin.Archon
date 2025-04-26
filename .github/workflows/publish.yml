@@ -61,7 +61,7 @@ jobs:
           community: northstar
           # Name of the team to publish the mod under
           # This should be modified if your github username is different than your team name on Thunderstore
-          namespace: GalacticMoblin # <------ DOUBLE CHECK THIS
+          namespace: ${{ github.repository_owner }} # <------ DOUBLE CHECK THIS
           # Name of the package
           name: MoblinArchon # This can be modified if the package name differs from the repo name
           # Package version to publish
@@ -72,5 +72,5 @@ jobs:
           token: ${{ secrets.TS_KEY }} 
           # Directory to wrap the contents of the repo in
           file: ./Moblin.Archon_v${{ env.cleanVersion }}.zip
-          deps: northstar-Northstar-1.30.1 The_Peepeepoopoo_man-Titanframework-2.4.3 # <------------- Uncomment this line to add dependencies to your mod, each sparated by a space
+          deps: northstar-Northstar@1.30.1 The_Peepeepoopoo_man-Titanframework@2.4.3 # <------------- Uncomment this line to add dependencies to your mod, each sparated by a space
           categories: Mods Server-side Client-side # <----------------------------- Add more categories as needed, separated by spaces
